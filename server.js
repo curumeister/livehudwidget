@@ -5,9 +5,12 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 
+/* 🔥 SERVIR HTML (RESOLVE SEU ERRO) */
+app.use(express.static(__dirname));
+
 const DATA_FILE = path.join(__dirname, "data.json");
 
-/* ---------- helpers de persistência ---------- */
+/* ---------- helpers ---------- */
 function ensureFile() {
   if (!fs.existsSync(DATA_FILE)) {
     const initial = {
@@ -36,14 +39,12 @@ app.get("/overlay-data", (req, res) => {
   res.json(loadData());
 });
 
-/* webhook (LivePix) */
 app.post("/webhook/livepix", (req, res) => {
   console.log("🔥 WEBHOOK:", JSON.stringify(req.body, null, 2));
 
   const data = loadData();
   const body = req.body;
 
-  // aceita formatos diferentes
   const amount =
     Number(body.amount) ||
     Number(body.value) ||
@@ -62,6 +63,7 @@ app.post("/webhook/livepix", (req, res) => {
       amount,
       timestamp: Date.now()
     };
+
     data.goal.current += amount;
 
     saveData(data);
