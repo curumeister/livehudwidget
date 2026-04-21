@@ -1,11 +1,19 @@
 import express from "express";
 import cors from "cors";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🔥 estado em memória (simples e eficiente)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* 🔥 SERVIR HTML */
+app.use(express.static(__dirname));
+
+/* 🔥 ESTADO */
 let state = {
   lastDonate: null,
   goal: {
@@ -14,29 +22,34 @@ let state = {
   }
 };
 
-// 🔔 webhook LivePix
+/* 🔥 WEBHOOK */
 app.post("/webhook", (req, res) => {
   const data = req.body;
 
-  // ⚠️ Ajustar conforme payload real da LivePix
-  const amount = data?.amount || 0;
+  const amount = Number(data?.amount || 0);
   const name = data?.name || "Anônimo";
 
   state.lastDonate = {
     name,
-    amount
+    amount,
+    timestamp: Date.now()
   };
 
   state.goal.current += amount;
 
-  console.log("Nova doação:", state.lastDonate);
+  console.log("Donate:", state.lastDonate);
 
   res.sendStatus(200);
 });
 
-// 📡 endpoint pro overlay
+/* 🔥 API */
 app.get("/overlay-data", (req, res) => {
   res.json(state);
+});
+
+/* 🔥 ROOT */
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 const PORT = process.env.PORT || 3000;
