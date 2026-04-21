@@ -1,20 +1,10 @@
-import express from "express";
-import cors from "cors";
-import path from "path";
-import { fileURLToPath } from "url";
-
+const express = require("express");
 const app = express();
-app.use(cors());
+
 app.use(express.json());
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-/* 🔥 SERVIR HTML */
-app.use(express.static(__dirname));
-
-/* 🔥 ESTADO */
-let state = {
+/* 🔥 DADOS DO WIDGET */
+let overlayData = {
   lastDonate: null,
   goal: {
     current: 0,
@@ -22,35 +12,51 @@ let state = {
   }
 };
 
-/* 🔥 WEBHOOK */
-app.post("/webhook", (req, res) => {
+/* 🔥 ROTA QUE O WIDGET USA */
+app.get("/overlay-data", (req, res) => {
+  res.json(overlayData);
+});
+
+/* 🔥 WEBHOOK (LIVEPIX VAI BATER AQUI) */
+app.post("/webhook/livepix", (req, res) => {
+  console.log("🔥 WEBHOOK RECEBIDO:");
+  console.log(JSON.stringify(req.body, null, 2));
+
   const data = req.body;
 
-  const amount = Number(data?.amount || 0);
-  const name = data?.name || "Anônimo";
+  /* aceita vários formatos (pra não quebrar) */
+  const amount =
+    Number(data.amount) ||
+    Number(data.value) ||
+    Number(data?.data?.amount) ||
+    0;
 
-  state.lastDonate = {
-    name,
-    amount,
-    timestamp: Date.now()
-  };
+  const name =
+    data.name ||
+    data.username ||
+    data?.data?.name ||
+    "Anon";
 
-  state.goal.current += amount;
+  if (amount > 0) {
+    overlayData.lastDonate = {
+      name,
+      amount,
+      timestamp: Date.now()
+    };
 
-  console.log("Donate:", state.lastDonate);
+    overlayData.goal.current += amount;
+  }
 
   res.sendStatus(200);
 });
 
-/* 🔥 API */
-app.get("/overlay-data", (req, res) => {
-  res.json(state);
-});
-
-/* 🔥 ROOT */
+/* 🔥 ROOT (pra não dar erro na home) */
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.send("Servidor OK");
 });
 
+/* 🔥 PORTA */
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Rodando na porta", PORT));
+app.listen(PORT, () => {
+  console.log("Servidor rodando na porta", PORT);
+});
