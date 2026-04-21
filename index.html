@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>HUD Live</title>
+
+<style>
+html, body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.hud {
+  display: flex;
+  justify-content: center;
+  padding: 20px 40px;
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  height: 70px;
+  border-radius: 26px;
+  overflow: hidden;
+}
+
+/* borda RGB */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 26px;
+  padding: 2px;
+  background: linear-gradient(120deg,#00f0ff,#6c5cff,#00f0ff);
+  background-size: 300% 300%;
+  animation: borderFlow 6s linear infinite;
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+}
+
+@keyframes borderFlow {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* pulse */
+.card.pulse::before {
+  animation: borderFlow 1s linear infinite;
+  filter: brightness(2);
+}
+
+.card-inner {
+  position: absolute;
+  inset: 2px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12,12,18,0.75);
+}
+
+/* texto */
+.ticker {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  font-size: 18px;
+}
+
+/* highlight */
+.ticker.highlight {
+  color: #00f0ff;
+  text-shadow: 0 0 15px #00f0ff;
+  transform: translate(-50%, -50%) scale(1.1);
+}
+
+.item {
+  position: absolute;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: 0.4s;
+}
+
+.item.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* clock */
+.clock {
+  position: absolute;
+  right: 15px;
+  top: 40%;
+  transform: translateY(-50%);
+  color: #ccc;
+}
+
+/* barra meta */
+.goal-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 20px;
+  right: 20px;
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.goal-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,#00f0ff,#6c5cff);
+  transition: width 0.5s;
+}
+
+/* flash */
+.goal-fill.flash {
+  box-shadow: 0 0 25px #00f0ff;
+}
+</style>
+</head>
+
+<body>
+
+<div class="hud">
+  <div id="card" class="card">
+    <div class="card-inner">
+
+      <div id="ticker" class="ticker"></div>
+      <div id="clock" class="clock"></div>
+
+      <div class="goal-bar">
+        <div id="goalFill" class="goal-fill"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const ticker = document.getElementById("ticker");
+const clockEl = document.getElementById("clock");
+const goalFill = document.getElementById("goalFill");
+const card = document.getElementById("card");
+
+let lastTimestamp = 0;
+let state = { items: [], index: 0 };
+
+/* relógio */
+setInterval(() => {
+  clockEl.innerText = new Date().toLocaleTimeString("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}, 1000);
+
+/* efeito donate */
+function triggerEffect() {
+  card.classList.add("pulse");
+  ticker.classList.add("highlight");
+  goalFill.classList.add("flash");
+
+  setTimeout(() => {
+    card.classList.remove("pulse");
+    ticker.classList.remove("highlight");
+    goalFill.classList.remove("flash");
+  }, 1500);
+}
+
+/* fetch */
+async function load() {
+  const res = await fetch("/overlay-data");
+  const data = await res.json();
+
+  const items = [];
+
+  if (data.lastDonate) {
+    items.push(`💜 ${data.lastDonate.name} doou R$ ${data.lastDonate.amount}`);
+
+    if (data.lastDonate.timestamp !== lastTimestamp) {
+      lastTimestamp = data.lastDonate.timestamp;
+      triggerEffect();
+    }
+  }
+
+  if (data.goal) {
+    items.push(`🎯 R$ ${data.goal.current} / ${data.goal.target}`);
+
+    const pct = Math.min((data.goal.current / data.goal.target)*100,100);
+    goalFill.style.width = pct + "%";
+  }
+
+  state.items = items;
+  render();
+}
+
+/* render */
+function render() {
+  ticker.innerHTML = state.items.map((t,i)=>
+    `<div class="item ${i===0?"active":""}">${t}</div>`
+  ).join("");
+}
+
+/* troca */
+setInterval(() => {
+  const all = document.querySelectorAll(".item");
+  if (!all.length) return;
+
+  all[state.index].classList.remove("active");
+  state.index = (state.index + 1) % all.length;
+  all[state.index].classList.add("active");
+}, 4000);
+
+/* init */
+load();
+setInterval(load, 3000);
+</script>
+
+</body>
+</html>
