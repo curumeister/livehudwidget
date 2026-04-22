@@ -13,90 +13,156 @@ html, body {
   font-family: 'Inter', sans-serif;
 }
 
-.container {
-  width: 300px;
-  height: 300px;
-  margin: 10px auto;
+/* SAFE AREA */
+body {
+  padding: 16px;
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
 }
 
+/* CONTAINER */
+.container {
+  width: 100%;
+  max-width: 760px;
+  height: 90px;
+}
+
+/* CARD */
 .card {
   width: 100%;
   height: 100%;
-  border-radius: 24px;
-  position: relative;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 12px 16px;
   box-sizing: border-box;
-  background: #0b0b0d;
-}
 
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 24px;
-  padding: 2px;
-  background: linear-gradient(135deg, #ff6a00, #ff2d55, #2BFFF9);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-}
-
-.content {
-  position: relative;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  background: linear-gradient(145deg, #0a0a0c, #121214);
+
+  border: 1px solid rgba(255,140,0,0.25);
+
+  box-shadow:
+    0 0 20px rgba(255,140,0,0.10),
+    inset 0 0 10px rgba(255,140,0,0.04);
 }
 
+/* ROW */
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* BLOCO */
+.block {
+  display: flex;
+  flex-direction: column;
+}
+
+/* LABEL */
 .label {
-  font-size: 11px;
-  color: #00D0A2;
+  font-size: 10px;
+  color: #777;
+  margin-bottom: 3px;
 }
 
+/* VALOR */
 .amount {
-  font-size: 28px;
+  font-size: 22px;
   color: #fff;
+  font-weight: 600;
 }
 
 .user {
-  font-size: 13px;
-  color: #00D0A2;
+  font-size: 11px;
+  color: #ff8c00;
 }
 
-.divider {
-  height: 1px;
-  background: rgba(255,255,255,0.08);
+/* META */
+.meta {
+  text-align: right;
 }
 
-.meta-box {
-  padding: 10px;
-  border-radius: 12px;
-  background: rgba(255,255,255,0.04);
-  text-align: center;
+.meta-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.meta-value {
+  font-size: 16px;
   color: #fff;
 }
 
-.weather {
-  display: flex;
-  justify-content: space-between;
+.meta-target {
   font-size: 11px;
-  color: #ccc;
-}
-
-.city {
-  text-align: center;
-  width: 33%;
-}
-
-.city-name {
-  font-size: 10px;
   color: #aaa;
 }
 
-.temp {
-  color: #2BFFF9;
+.percent {
+  padding: 3px 8px;
+  border-radius: 20px;
+  background: rgba(255,140,0,0.15);
+  color: #ff8c00;
+  font-size: 11px;
+}
+
+/* BARRA */
+.bar {
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+/* PROGRESSO */
+.fill {
+  height: 100%;
+  width: 0%;
+  position: relative;
+
+  background: linear-gradient(90deg, #ff7a00, #ffb347);
+
+  box-shadow: 0 0 10px rgba(255,140,0,0.5);
+
+  overflow: hidden;
+  transition: width 0.4s ease;
+}
+
+/* LUZ GROSSA */
+.fill::after {
+  content: "";
+  position: absolute;
+  top: -100%;
+  left: -60%;
+  width: 60%;
+  height: 300%;
+
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(255,255,255,0.9),
+    rgba(255,255,255,0.6),
+    transparent
+  );
+
+  filter: blur(4px);
+  transform: rotate(25deg);
+
+  animation: shineMove 2s linear infinite;
+}
+
+@keyframes shineMove {
+  0% { left: -60%; }
+  100% { left: 120%; }
 }
 </style>
 </head>
@@ -105,52 +171,41 @@ html, body {
 
 <div class="container">
   <div class="card">
-    <div class="content">
 
-      <!-- DOAÇÃO -->
-      <div>
+    <div class="row">
+
+      <div class="block">
         <div class="label">ÚLTIMA DOAÇÃO</div>
         <div id="amount" class="amount">R$ 0</div>
         <div id="user" class="user">—</div>
       </div>
 
-      <div class="divider"></div>
+      <div class="block meta">
+        <!-- 🔥 ALTERADO AQUI -->
+        <div class="label">2º Monitor</div>
 
-      <!-- META DINÂMICA -->
-      <div>
-        <div class="label">META</div>
-        <div id="metaBox" class="meta-box">Carregando...</div>
-      </div>
-
-      <div class="divider"></div>
-
-      <!-- CLIMA -->
-      <div class="weather">
-        <div class="city" id="c1">
-          <div class="city-name">São Paulo</div>
-          <div class="temp">--</div>
-        </div>
-
-        <div class="city" id="c2">
-          <div class="city-name">Belo Horizonte</div>
-          <div class="temp">--</div>
-        </div>
-
-        <div class="city" id="c3">
-          <div class="city-name">Rio de Janeiro</div>
-          <div class="temp">--</div>
+        <div class="meta-line">
+          <span id="metaValue" class="meta-value">R$ 0</span>
+          <span class="meta-target">/ <span id="metaTarget">R$ 0</span></span>
+          <span id="percent" class="percent">0%</span>
         </div>
       </div>
 
     </div>
+
+    <div class="bar">
+      <div id="fill" class="fill"></div>
+    </div>
+
   </div>
 </div>
 
 <script>
-const API_KEY = "46f49c9551bea5305c63071f37f9622d";
-
 function money(v){
-  return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+  return v.toLocaleString('pt-BR',{
+    style:'currency',
+    currency:'BRL'
+  });
 }
 
 async function load(){
@@ -158,41 +213,29 @@ async function load(){
   const data = await res.json();
 
   if(data.lastDonate){
-    document.getElementById("amount").innerText = money(data.lastDonate.amount);
-    document.getElementById("user").innerText = "por " + data.lastDonate.name;
+    document.getElementById("amount").innerText =
+      money(data.lastDonate.amount);
+
+    document.getElementById("user").innerText =
+      "por " + data.lastDonate.name;
   }
 
   if(data.goal){
-    const pct = Math.floor((data.goal.current/data.goal.target)*100);
-    document.getElementById("metaBox").innerText =
-      `${money(data.goal.current)} / ${money(data.goal.target)} • ${pct}%`;
-  }
-}
+    const current = data.goal.current;
+    const target = data.goal.target;
 
-const cities = [
-  {el:"c1",q:"Sao Paulo,BR"},
-  {el:"c2",q:"Belo Horizonte,BR"},
-  {el:"c3",q:"Rio de Janeiro,BR"}
-];
+    const pct = Math.min(Math.floor((current / target) * 100), 100);
 
-async function loadWeather(){
-  for(const c of cities){
-    try{
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${c.q}&units=metric&appid=${API_KEY}`
-      );
-      const data = await res.json();
-      document.querySelector(`#${c.el} .temp`).innerText =
-        Math.round(data.main.temp)+"°C";
-    }catch{}
+    document.getElementById("metaValue").innerText = money(current);
+    document.getElementById("metaTarget").innerText = money(target);
+    document.getElementById("percent").innerText = pct + "%";
+
+    document.getElementById("fill").style.width = pct + "%";
   }
 }
 
 load();
-setInterval(load,3000);
-
-loadWeather();
-setInterval(loadWeather,600000);
+setInterval(load, 3000);
 </script>
 
 </body>
