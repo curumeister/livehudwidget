@@ -34,16 +34,29 @@ app.get("/overlay-data", (req, res) => {
   res.json(loadData());
 });
 
+/* 🔥 WEBHOOK LIVEPIX */
 app.post("/webhook/livepix", (req, res) => {
+  console.log("Webhook recebido:", req.body);
+
   const data = loadData();
 
   const amount = Number(req.body.amount || 0);
   const name = req.body.name || "Anon";
 
   if (amount > 0) {
-    data.lastDonate = { name, amount };
+    data.lastDonate = {
+      id: Date.now(), // 🔥 ESSENCIAL PRA NOTIFICAÇÃO
+      name,
+      amount
+    };
+
     data.goal.current += amount;
+
     saveData(data);
+
+    console.log("Donate salvo:", data.lastDonate);
+  } else {
+    console.log("Webhook ignorado (amount inválido)");
   }
 
   res.sendStatus(200);
@@ -52,5 +65,5 @@ app.post("/webhook/livepix", (req, res) => {
 /* ---------- START ---------- */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Servidor rodando");
+  console.log("Servidor rodando na porta " + PORT);
 });
