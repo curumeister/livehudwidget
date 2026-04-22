@@ -3,14 +3,17 @@
 <head>
 <meta charset="UTF-8">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- 🔒 carregamento mais confiável da fonte -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 html, body {
   margin: 0;
   padding: 0;
   background: transparent;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Orbitron', monospace; /* fallback sólido */
 }
 
 /* SAFE AREA */
@@ -28,60 +31,98 @@ body {
 .container {
   width: 100%;
   max-width: 760px;
-  height: 90px;
+  height: 110px;
 }
 
 /* CARD */
 .card {
+  position: relative;
+
   width: 100%;
   height: 100%;
   border-radius: 16px;
-  padding: 12px 16px;
+  padding: 18px 16px 12px 16px;
   box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  background: linear-gradient(145deg, #0a0a0c, #121214);
+  background:
+    radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,0.10), transparent 60%),
+    linear-gradient(180deg, #111113 0%, #0a0a0c 100%);
 
-  border: 1px solid rgba(255,140,0,0.25);
+  border: 1px solid rgba(255,255,255,0.14);
 
   box-shadow:
-    0 0 20px rgba(255,140,0,0.10),
-    inset 0 0 10px rgba(255,140,0,0.04);
+    inset 0 1px 0 rgba(255,255,255,0.08),
+    inset 0 -1px 0 rgba(255,255,255,0.04),
+    0 8px 25px rgba(0,0,0,0.8);
 }
+
+/* TOPO ROTATIVO */
+.top-center {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 420px;
+  height: 20px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.rotating {
+  position: absolute;
+  width: 100%;
+  left: 0;
+
+  font-size: 16px;
+  letter-spacing: 2px;
+  color: #ff8c00;
+
+  text-shadow:
+    0 0 4px rgba(255,140,0,0.7),
+    0 0 10px rgba(255,140,0,0.4);
+
+  transition: transform 0.5s ease, opacity 0.5s ease;
+}
+
+.show { transform: translateX(0); opacity: 1; }
+.left { transform: translateX(-100%); opacity: 0; }
+.right { transform: translateX(100%); opacity: 0; }
 
 /* ROW */
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-top: 12px;
 }
 
-/* BLOCO */
 .block {
   display: flex;
   flex-direction: column;
 }
 
-/* LABEL */
-.label {
-  font-size: 10px;
-  color: #777;
-  margin-bottom: 3px;
+/* NOME DO DOADOR (NEON) */
+.donor {
+  font-size: 12px;
+  color: #ff8c00;
+  margin-bottom: 4px;
+  letter-spacing: 1px;
+
+  text-shadow:
+    0 0 5px rgba(255,140,0,0.8),
+    0 0 10px rgba(255,140,0,0.5);
 }
 
 /* VALOR */
 .amount {
-  font-size: 22px;
+  font-size: 26px;
   color: #fff;
   font-weight: 600;
-}
-
-.user {
-  font-size: 11px;
-  color: #ff8c00;
 }
 
 /* META */
@@ -97,30 +138,31 @@ body {
 }
 
 .meta-value {
-  font-size: 16px;
+  font-size: 18px;
   color: #fff;
 }
 
 .meta-target {
-  font-size: 11px;
+  font-size: 12px;
   color: #aaa;
 }
 
 .percent {
-  padding: 3px 8px;
+  padding: 4px 10px;
   border-radius: 20px;
   background: rgba(255,140,0,0.15);
   color: #ff8c00;
-  font-size: 11px;
+  font-size: 12px;
 }
 
-/* BARRA */
+/* 🔒 BARRA (confinando glow) */
 .bar {
   width: 100%;
   height: 3px;
-  background: rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.08);
   border-radius: 20px;
   overflow: hidden;
+  position: relative; /* importante p/ confinar efeitos */
 }
 
 /* PROGRESSO */
@@ -131,13 +173,13 @@ body {
 
   background: linear-gradient(90deg, #ff7a00, #ffb347);
 
-  box-shadow: 0 0 10px rgba(255,140,0,0.5);
+  /* 🔧 glow reduzido (sem vazar) */
+  box-shadow: 0 0 5px rgba(255,140,0,0.3);
 
-  overflow: hidden;
   transition: width 0.4s ease;
 }
 
-/* LUZ GROSSA */
+/* 🔧 luz com blur reduzido */
 .fill::after {
   content: "";
   position: absolute;
@@ -149,12 +191,11 @@ body {
   background: linear-gradient(
     110deg,
     transparent,
-    rgba(255,255,255,0.9),
     rgba(255,255,255,0.6),
     transparent
   );
 
-  filter: blur(4px);
+  filter: blur(2px); /* reduz vazamento */
   transform: rotate(25deg);
 
   animation: shineMove 2s linear infinite;
@@ -172,18 +213,20 @@ body {
 <div class="container">
   <div class="card">
 
+    <!-- TOPO -->
+    <div class="top-center">
+      <div id="textA" class="rotating show">2º MONITOR</div>
+      <div id="textB" class="rotating right">LINKS NA BIO</div>
+    </div>
+
     <div class="row">
 
       <div class="block">
-        <div class="label">ÚLTIMA DOAÇÃO</div>
+        <div id="donor" class="donor">—</div>
         <div id="amount" class="amount">R$ 0</div>
-        <div id="user" class="user">—</div>
       </div>
 
       <div class="block meta">
-        <!-- 🔥 ALTERADO AQUI -->
-        <div class="label">2º Monitor</div>
-
         <div class="meta-line">
           <span id="metaValue" class="meta-value">R$ 0</span>
           <span class="meta-target">/ <span id="metaTarget">R$ 0</span></span>
@@ -208,6 +251,22 @@ function money(v){
   });
 }
 
+/* slide lateral */
+let showingA = true;
+setInterval(()=>{
+  const a = document.getElementById("textA");
+  const b = document.getElementById("textB");
+
+  if(showingA){
+    a.className = "rotating left";
+    b.className = "rotating show";
+  } else {
+    b.className = "rotating right";
+    a.className = "rotating show";
+  }
+  showingA = !showingA;
+}, 4000);
+
 async function load(){
   const res = await fetch("/overlay-data");
   const data = await res.json();
@@ -216,8 +275,8 @@ async function load(){
     document.getElementById("amount").innerText =
       money(data.lastDonate.amount);
 
-    document.getElementById("user").innerText =
-      "por " + data.lastDonate.name;
+    document.getElementById("donor").innerText =
+      data.lastDonate.name;
   }
 
   if(data.goal){
