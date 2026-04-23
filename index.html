@@ -3,285 +3,300 @@
 <head>
 <meta charset="UTF-8">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
 html, body {
   margin: 0;
   padding: 0;
   background: transparent;
-  font-family: 'Orbitron', monospace;
+  height: 100%;
 }
 
-body {
-  padding: 16px;
+/* SAFE */
+.safe {
+  width: 100%;
+  height: 100%;
+  padding: 4vh 4vw;
+  box-sizing: border-box;
   display: flex;
-  align-items: center;
   justify-content: center;
-  height: 100vh;
+  align-items: center;
 }
 
 .container {
   width: 100%;
-  max-width: 760px;
-  height: 110px;
+  max-width: 900px;
+  height: 90px;
 }
 
+/* CARD */
 .card {
-  position: relative;
   width: 100%;
   height: 100%;
-  border-radius: 16px;
-  padding: 18px 16px 12px 16px;
-  box-sizing: border-box;
+  border-radius: 22px;
+  position: relative;
+  overflow: hidden;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-
-  background:
-    radial-gradient(120% 140% at 15% 0%, rgba(255,255,255,0.10), transparent 60%),
-    linear-gradient(180deg, #111113 0%, #0a0a0c 100%);
-
-  border: 1px solid rgba(255,255,255,0.14);
+  background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(10,10,12,0.95));
+  border: 1px solid rgba(255,255,255,0.08);
 
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.08),
-    inset 0 -1px 0 rgba(255,255,255,0.04),
-    0 8px 25px rgba(0,0,0,0.8);
+    inset 0 -10px 20px rgba(0,0,0,0.6),
+    0 10px 30px rgba(0,0,0,0.6);
 }
 
-/* TOPO */
-.top-center {
+/* GLOW */
+.card::before {
+  content: "";
   position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 420px;
+  bottom: -6px;
+  left: 10%;
+  width: 80%;
   height: 20px;
-  overflow: hidden;
-  text-align: center;
+
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255,120,0,0.95),
+    rgba(255,120,0,0.45) 40%,
+    transparent 70%
+  );
+
+  filter: blur(12px);
 }
 
-.rotating {
+.card::after {
+  content: "";
   position: absolute;
-  width: 100%;
-  font-size: 16px;
-  letter-spacing: 2px;
-  color: #ff8c00;
-
-  text-shadow:
-    0 0 4px rgba(255,140,0,0.7),
-    0 0 10px rgba(255,140,0,0.4);
-
-  transition: transform 0.5s ease, opacity 0.5s ease;
-}
-
-.show { transform: translateX(0); opacity: 1; }
-.left { transform: translateX(-100%); opacity: 0; }
-.right { transform: translateX(100%); opacity: 0; }
-
-/* ROW */
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12px;
-}
-
-.block {
-  display: flex;
-  flex-direction: column;
-}
-
-.donor {
-  font-size: 12px;
-  color: #ff8c00;
-  margin-bottom: 4px;
-
-  text-shadow:
-    0 0 5px rgba(255,140,0,0.8),
-    0 0 10px rgba(255,140,0,0.5);
-}
-
-.amount {
-  font-size: 26px;
-  color: #fff;
-  font-weight: 600;
-}
-
-.meta-line {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  justify-content: flex-end;
-}
-
-.meta-value { font-size: 18px; color: #fff; }
-.meta-target { font-size: 12px; color: #aaa; }
-
-.percent {
-  padding: 4px 10px;
-  border-radius: 20px;
-  background: rgba(255,140,0,0.15);
-  color: #ff8c00;
-  font-size: 12px;
-}
-
-/* BARRA */
-.bar {
-  width: 100%;
+  bottom: 0;
+  left: 5%;
+  width: 90%;
   height: 3px;
-  background: rgba(255,255,255,0.08);
   border-radius: 20px;
-  overflow: hidden;
+
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #ff7a00,
+    #ffb347,
+    #ff7a00,
+    transparent
+  );
+
+  box-shadow:
+    0 0 10px rgba(255,140,0,0.9),
+    0 0 25px rgba(255,140,0,0.6);
 }
 
-.fill {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #ff7a00, #ffb347);
-  box-shadow: 0 0 5px rgba(255,140,0,0.3);
-  transition: width 0.4s ease;
-}
-
-/* 🔥 ALERTA */
-.alert {
-  position: fixed;
-  bottom: 30px;
+/* TEXTO */
+.title {
+  position: absolute;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%) scale(0.9);
-  background: rgba(0,0,0,0.9);
-  border: 1px solid rgba(255,140,0,0.3);
-  padding: 12px 20px;
-  border-radius: 12px;
-  color: #ff8c00;
-  font-size: 14px;
-  opacity: 0;
-  transition: all 0.3s ease;
-  box-shadow: 0 0 20px rgba(255,140,0,0.3);
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  letter-spacing: 2px;
+  text-align: center;
+
+  color: #ff8c00; /* 🔥 neon */
+
+  text-shadow:
+    0 0 6px rgba(255,140,0,0.8),
+    0 0 14px rgba(255,120,0,0.6);
+
+  transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
-.alert.show {
-  opacity: 1;
-  transform: translateX(-50%) scale(1);
+.fade-out {
+  opacity: 0;
+  transform: translate(-50%, -80%);
 }
+
+.audiowide { font-family: 'Audiowide'; }
+.roboto { font-family: 'Roboto'; }
+
+/* CLIMA */
+.weather {
+  position: absolute;
+  left: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Roboto';
+  font-size: 14px;
+  color: #ccc;
+  transition: opacity .3s ease;
+}
+
+.weather.hide { opacity: 0; }
+
+/* DIREITA */
+.right {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Roboto';
+  font-size: 14px;
+  color: #aaa;
+  transition: opacity .3s ease;
+}
+
+.right.hide { opacity: 0; }
+
+/* GLITCH SUAVE */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+
+.glitch::before,
+.glitch::after {
+  content: "CURU";
+  position: absolute;
+  left: 0;
+  opacity: 0.5;
+}
+
+.glitch::before {
+  color: #ff3c00;
+  transform: translate(1px,-1px);
+  animation: glitch1 0.4s infinite;
+}
+
+.glitch::after {
+  color: #00ffff;
+  transform: translate(-1px,1px);
+  animation: glitch2 0.4s infinite;
+}
+
+@keyframes glitch1 { 50% { transform: translate(-1px,1px); } }
+@keyframes glitch2 { 50% { transform: translate(1px,-1px); } }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-  <div class="card">
+<div class="safe">
+  <div class="container">
+    <div class="card">
 
-    <div class="top-center">
-      <div id="textA" class="rotating show">2º MONITOR</div>
-      <div id="textB" class="rotating right">LINKS NA BIO</div>
+      <div id="text" class="title audiowide">LIVEPX NA BIO</div>
+      <div id="weather" class="weather">Carregando...</div>
+      <div id="right" class="right">--:--</div>
+
     </div>
-
-    <div class="row">
-      <div class="block">
-        <div id="donor" class="donor">—</div>
-        <div id="amount" class="amount">R$ 0</div>
-      </div>
-
-      <div class="block meta">
-        <div class="meta-line">
-          <span id="metaValue" class="meta-value">R$ 0</span>
-          <span class="meta-target">/ <span id="metaTarget">R$ 0</span></span>
-          <span id="percent" class="percent">0%</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="bar">
-      <div id="fill" class="fill"></div>
-    </div>
-
   </div>
 </div>
 
-<!-- ALERT -->
-<div id="alert" class="alert"></div>
-
 <script>
-function money(v){
-  return v.toLocaleString('pt-BR',{
-    style:'currency',
-    currency:'BRL'
-  });
-}
+const API_KEY = "46f49c9551bea5305c63071f37f9622d";
 
-/* ROTAÇÃO */
-let showingA = true;
-setInterval(()=>{
-  const a = document.getElementById("textA");
-  const b = document.getElementById("textB");
+/* SCRAMBLE */
+function scramble(el, text){
+  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+  let frame=0;
 
-  if(showingA){
-    a.className = "rotating left";
-    b.className = "rotating show";
-  } else {
-    b.className = "rotating right";
-    a.className = "rotating show";
-  }
-
-  showingA = !showingA;
-}, 4000);
-
-/* 🔥 DETECTOR */
-let lastDonateId = null;
-
-async function load(){
-  const res = await fetch("/overlay-data");
-  const data = await res.json();
-
-  if(data.lastDonate){
-
-    if(lastDonateId && lastDonateId !== data.lastDonate.id){
-      showAlert(data.lastDonate);
+  function run(){
+    let out="";
+    for(let i=0;i<text.length;i++){
+      out += i<frame ? text[i] : chars[Math.floor(Math.random()*chars.length)];
     }
+    el.innerText=out;
 
-    lastDonateId = data.lastDonate.id;
-
-    document.getElementById("amount").innerText =
-      money(data.lastDonate.amount);
-
-    document.getElementById("donor").innerText =
-      data.lastDonate.name;
+    if(frame<=text.length){
+      frame+=0.2;
+      requestAnimationFrame(run);
+    } else {
+      el.innerText=text;
+    }
   }
-
-  if(data.goal){
-    const current = data.goal.current;
-    const target = data.goal.target;
-
-    const pct = Math.min(Math.floor((current / target) * 100), 100);
-
-    document.getElementById("metaValue").innerText = money(current);
-    document.getElementById("metaTarget").innerText = money(target);
-    document.getElementById("percent").innerText = pct + "%";
-
-    document.getElementById("fill").style.width = pct + "%";
-  }
+  run();
 }
 
-/* 🔥 ALERTA */
-function showAlert(d){
-  const el = document.getElementById("alert");
+/* TEXTO */
+const textEl=document.getElementById("text");
 
-  el.innerText = `${d.name} doou ${money(d.amount)}`;
-  el.classList.add("show");
+const texts=[
+  {html:"LIVEPX NA BIO",class:"audiowide",scramble:true},
+  {html:'cupom <span class="glitch">CURU</span> na tradeit.gg te dá descontos',class:"roboto"}
+];
+
+let ti=0;
+
+setInterval(()=>{
+  textEl.classList.add("fade-out");
 
   setTimeout(()=>{
-    el.classList.remove("show");
-  }, 3000);
+    ti=(ti+1)%texts.length;
+    textEl.className="title "+texts[ti].class;
+    textEl.innerHTML=texts[ti].html;
+    textEl.classList.remove("fade-out");
+
+    if(texts[ti].scramble){
+      scramble(textEl,"LIVEPX NA BIO");
+    }
+
+  },400);
+
+},6000);
+
+scramble(textEl,"LIVEPX NA BIO");
+
+/* CLIMA */
+const weatherEl=document.getElementById("weather");
+const cities=["Sao Paulo,BR","Rio de Janeiro,BR","Belo Horizonte,BR"];
+let data=[],wi=0;
+
+async function loadWeather(){
+  data=[];
+  for(const c of cities){
+    try{
+      const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${c}&units=metric&appid=${API_KEY}`);
+      const d=await r.json();
+      data.push(`${d.name} ${Math.round(d.main.temp)}°C`);
+    }catch{}
+  }
+  if(data.length) weatherEl.innerText=data[0];
 }
 
-load();
-setInterval(load, 2000);
+setInterval(()=>{
+  if(data.length){
+    wi=(wi+1)%data.length;
+    weatherEl.classList.add("hide");
+    setTimeout(()=>{
+      weatherEl.innerText=data[wi];
+      weatherEl.classList.remove("hide");
+    },200);
+  }
+},4000);
+
+/* DIREITA: RELÓGIO + MERCADO */
+const rightEl=document.getElementById("right");
+
+let showClock=true;
+let marketText="BTC 345K • ETH 18K";
+
+setInterval(()=>{
+  rightEl.classList.add("hide");
+
+  setTimeout(()=>{
+    if(showClock){
+      const now=new Date();
+      rightEl.innerText=now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    } else {
+      rightEl.innerText=marketText;
+    }
+    rightEl.classList.remove("hide");
+    showClock=!showClock;
+  },200);
+
+},4000);
+
+/* INIT */
+loadWeather();
+setInterval(loadWeather,900000);
 </script>
 
 </body>
