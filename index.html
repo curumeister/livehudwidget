@@ -7,39 +7,23 @@
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  height: 100%;
-}
+html, body { margin:0; padding:0; background:transparent; height:100%; }
 
 .safe {
-  width: 100%;
-  height: 100%;
-  padding: 4vh 4vw;
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  width:100%; height:100%;
+  padding:4vh 4vw;
+  box-sizing:border-box;
+  display:flex; justify-content:center; align-items:center;
 }
 
-.container {
-  width: 100%;
-  max-width: 900px;
-  height: 90px;
-}
+.container { width:100%; max-width:900px; height:90px; }
 
 .card {
-  width: 100%;
-  height: 100%;
-  border-radius: 22px;
-  position: relative;
-  overflow: hidden;
-
-  background: linear-gradient(180deg, rgba(20,20,25,0.9), rgba(10,10,12,0.95));
-  border: 1px solid rgba(255,255,255,0.08);
-
+  width:100%; height:100%;
+  border-radius:22px;
+  position:relative; overflow:hidden;
+  background:linear-gradient(180deg, rgba(20,20,25,0.9), rgba(10,10,12,0.95));
+  border:1px solid rgba(255,255,255,0.08);
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.08),
     inset 0 -10px 20px rgba(0,0,0,0.6),
@@ -47,133 +31,55 @@ html, body {
 }
 
 .card::before {
-  content: "";
-  position: absolute;
-  bottom: -6px;
-  left: 10%;
-  width: 80%;
-  height: 20px;
-
-  background: radial-gradient(
-    ellipse at center,
-    rgba(255,120,0,0.95),
-    rgba(255,120,0,0.45) 40%,
-    transparent 70%
-  );
-
-  filter: blur(12px);
+  content:""; position:absolute; bottom:-6px; left:10%;
+  width:80%; height:20px;
+  background:radial-gradient(ellipse at center, rgba(255,120,0,0.95), rgba(255,120,0,0.45) 40%, transparent 70%);
+  filter:blur(12px);
 }
 
 .card::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 5%;
-  width: 90%;
-  height: 3px;
-  border-radius: 20px;
-
-  background: linear-gradient(
-    90deg,
-    transparent,
-    #ff7a00,
-    #ffb347,
-    #ff7a00,
-    transparent
-  );
-
-  box-shadow:
-    0 0 10px rgba(255,140,0,0.9),
-    0 0 25px rgba(255,140,0,0.6);
+  content:""; position:absolute; bottom:0; left:5%;
+  width:90%; height:3px;
+  border-radius:20px;
+  background:linear-gradient(90deg,transparent,#ff7a00,#ffb347,#ff7a00,transparent);
 }
 
 /* TEXTO */
 .title {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  color: #ff8c00;
-
-  text-shadow:
-    0 0 6px rgba(255,140,0,0.8),
-    0 0 14px rgba(255,120,0,0.6);
-
-  transition: opacity 0.4s ease, transform 0.4s ease;
+  position:absolute; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  color:#ff8c00;
+  transition:.4s;
 }
 
-.fade-out {
-  opacity: 0;
-  transform: translate(-50%, -80%);
-}
+.audiowide { font-family:'Audiowide'; font-size:24px; }
+.roboto { font-family:'Roboto'; }
+.small { font-size:18px; }
 
-.audiowide {
-  font-family: 'Audiowide';
-  font-size: 24px;
-  letter-spacing: 2px;
-}
-
-.roboto {
-  font-family: 'Roboto';
-}
-
-.small {
-  font-size: 18px;
-  letter-spacing: 1px;
-  opacity: 0.95;
-}
-
-/* CLIMA */
 .weather {
-  position: absolute;
-  left: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: 'Roboto';
-  font-size: 14px;
-  color: #ccc;
-  transition: opacity .3s ease;
+  position:absolute; left:20px; top:50%;
+  transform:translateY(-50%);
+  font-family:'Roboto'; font-size:14px; color:#ccc;
+  transition:.3s;
 }
-.weather.hide { opacity: 0; }
+.weather.hide { opacity:0; }
 
-/* DIREITA */
 .right {
-  position: absolute;
-  right: 20px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-family: 'Roboto';
-  font-size: 14px;
-  color: #aaa;
-  transition: opacity .3s ease;
+  position:absolute; right:20px; top:50%;
+  transform:translateY(-50%);
+  font-family:'Roboto'; font-size:14px; color:#aaa;
+  transition:.3s;
 }
-.right.hide { opacity: 0; }
+.right.hide { opacity:0; }
 
-/* GLITCH SUAVE */
-.glitch {
-  position: relative;
-  display: inline-block;
+/* glitch suave */
+.glitch { position:relative; }
+.glitch::before,.glitch::after {
+  content:"CURU"; position:absolute; left:0; opacity:.5;
 }
-.glitch::before,
-.glitch::after {
-  content: "CURU";
-  position: absolute;
-  left: 0;
-  opacity: 0.5;
-}
-.glitch::before {
-  color: #ff3c00;
-  transform: translate(1px,-1px);
-  animation: glitch1 0.4s infinite;
-}
-.glitch::after {
-  color: #00ffff;
-  transform: translate(-1px,1px);
-  animation: glitch2 0.4s infinite;
-}
-@keyframes glitch1 { 50% { transform: translate(-1px,1px); } }
-@keyframes glitch2 { 50% { transform: translate(1px,-1px); } }
+.glitch::before { color:#ff3c00; transform:translate(1px,-1px); }
+.glitch::after { color:#00ffff; transform:translate(-1px,1px); }
 </style>
 </head>
 
@@ -184,7 +90,7 @@ html, body {
     <div class="card">
 
       <div id="text" class="title audiowide">LIVEPX NA BIO</div>
-      <div id="weather" class="weather">Carregando...</div>
+      <div id="weather" class="weather">São Paulo 25°C</div>
       <div id="right" class="right">--:--</div>
 
     </div>
@@ -194,7 +100,11 @@ html, body {
 <script>
 const API_KEY = "46f49c9551bea5305c63071f37f9622d";
 
-/* SCRAMBLE */
+/* ================= FALLBACK STATE ================= */
+let lastWeather = ["São Paulo 25°C"];
+let lastMarket = "BTC 300K • ETH 15K";
+
+/* ================= SCRAMBLE ================= */
 function scramble(el, text){
   const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
   let frame=0;
@@ -216,15 +126,12 @@ function scramble(el, text){
   run();
 }
 
-/* TEXTO */
+/* ================= TEXTO ================= */
 const textEl=document.getElementById("text");
 
 const texts=[
   {html:"LIVEPX NA BIO",class:"audiowide",scramble:true},
-  {
-    html:'cupom <span class="glitch">CURU</span> na tradeit.gg te dá descontos',
-    class:"roboto small"
-  }
+  {html:'cupom <span class="glitch">CURU</span> na tradeit.gg te dá descontos',class:"roboto small"}
 ];
 
 let ti=0;
@@ -241,46 +148,51 @@ setInterval(()=>{
     if(texts[ti].scramble){
       scramble(textEl,"LIVEPX NA BIO");
     }
-
   },400);
 
 },6000);
 
 scramble(textEl,"LIVEPX NA BIO");
 
-/* CLIMA */
+/* ================= CLIMA COM FALLBACK ================= */
 const weatherEl=document.getElementById("weather");
 const cities=["Sao Paulo,BR","Rio de Janeiro,BR","Belo Horizonte,BR"];
-let data=[],wi=0;
+let wi=0;
 
 async function loadWeather(){
-  data=[];
+  let tempData=[];
+
   for(const c of cities){
     try{
       const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${c}&units=metric&appid=${API_KEY}`);
       const d=await r.json();
-      data.push(`${d.name} ${Math.round(d.main.temp)}°C`);
+
+      if(d?.main?.temp){
+        tempData.push(`${d.name} ${Math.round(d.main.temp)}°C`);
+      }
     }catch{}
   }
-  if(data.length) weatherEl.innerText=data[0];
+
+  if(tempData.length){
+    lastWeather = tempData; // atualiza só se válido
+  }
 }
 
 setInterval(()=>{
-  if(data.length){
-    wi=(wi+1)%data.length;
+  if(lastWeather.length){
+    wi=(wi+1)%lastWeather.length;
     weatherEl.classList.add("hide");
+
     setTimeout(()=>{
-      weatherEl.innerText=data[wi];
+      weatherEl.innerText=lastWeather[wi];
       weatherEl.classList.remove("hide");
     },200);
   }
 },4000);
 
-/* MERCADO + RELÓGIO */
+/* ================= MERCADO COM FALLBACK ================= */
 const rightEl=document.getElementById("right");
-
 let showClock=true;
-let marketText="—";
 
 function formatValue(v){
   if(v>=1000) return (v/1000).toFixed(0)+"K";
@@ -292,10 +204,11 @@ async function loadMarket(){
     const res=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl");
     const d=await res.json();
 
-    marketText=`BTC ${formatValue(d.bitcoin.brl)} • ETH ${formatValue(d.ethereum.brl)}`;
-  }catch{
-    marketText="indisponível";
-  }
+    if(d?.bitcoin?.brl && d?.ethereum?.brl){
+      lastMarket = `BTC ${formatValue(d.bitcoin.brl)} • ETH ${formatValue(d.ethereum.brl)}`;
+    }
+
+  }catch{}
 }
 
 setInterval(()=>{
@@ -306,10 +219,12 @@ setInterval(()=>{
       const now=new Date();
       rightEl.innerText=now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
     } else {
-      rightEl.innerText=marketText;
+      rightEl.innerText=lastMarket; // fallback aqui
     }
+
     rightEl.classList.remove("hide");
     showClock=!showClock;
+
   },200);
 
 },4000);
