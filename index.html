@@ -3,238 +3,259 @@
 <head>
 <meta charset="UTF-8">
 
-<link href="https://fonts.googleapis.com/css2?family=Audiowide&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Roboto:wght@400;500;700&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 
 <style>
-html, body { margin:0; padding:0; background:transparent; height:100%; }
-
-.safe {
-  width:100%; height:100%;
-  padding:4vh 4vw;
-  box-sizing:border-box;
-  display:flex; justify-content:center; align-items:center;
+html,body{
+  margin:0;
+  background:transparent;
+  height:100%;
 }
 
-.container { width:100%; max-width:900px; height:90px; }
-
-.card {
-  width:100%; height:100%;
-  border-radius:22px;
-  position:relative; overflow:hidden;
-  background:linear-gradient(180deg, rgba(20,20,25,0.9), rgba(10,10,12,0.95));
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    inset 0 -10px 20px rgba(0,0,0,0.6),
-    0 10px 30px rgba(0,0,0,0.6);
+.safe{
+  width:100%;
+  height:100%;
+  padding:clamp(28px,5vh,70px) clamp(24px,5vw,70px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
 }
 
-.card::before {
-  content:""; position:absolute; bottom:-6px; left:10%;
-  width:80%; height:20px;
-  background:radial-gradient(ellipse at center, rgba(255,120,0,0.95), rgba(255,120,0,0.45) 40%, transparent 70%);
-  filter:blur(12px);
+.bar{
+  width:100%;
+  max-width:1100px;
+  height:96px;
+
+  background:#ff7a00;
+  border-radius:24px;
+
+  display:flex;
+  align-items:center;
+
+  padding:0 26px;
+  gap:18px;
+
+  box-shadow:0 8px 24px rgba(0,0,0,0.35);
 }
 
-.card::after {
-  content:""; position:absolute; bottom:0; left:5%;
-  width:90%; height:3px;
-  border-radius:20px;
-  background:linear-gradient(90deg,transparent,#ff7a00,#ffb347,#ff7a00,transparent);
+/* CLIMA */
+.weather{
+  width:200px;
+  display:flex;
+  flex-direction:column;
 }
 
-/* TEXTO */
-.title {
-  position:absolute; top:50%; left:50%;
-  transform:translate(-50%,-50%);
+.weather-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.icon{
+  width:20px;
+  height:20px;
+  stroke:#000;
+  stroke-width:2;
+  fill:none;
+}
+
+.city{font-size:13px;}
+.temp{font-size:26px;font-weight:700;}
+.desc{font-size:12px;opacity:0.7;}
+
+/* CENTRO */
+.center{
+  flex:1;
   text-align:center;
-  color:#ff8c00;
-  transition:.4s;
 }
 
-.audiowide { font-family:'Audiowide'; font-size:24px; }
-.roboto { font-family:'Roboto'; }
-.small { font-size:18px; }
-
-.weather {
-  position:absolute; left:20px; top:50%;
-  transform:translateY(-50%);
-  font-family:'Roboto'; font-size:14px; color:#ccc;
-  transition:.3s;
+.title{
+  font-family:'Audiowide';
+  font-size:28px;
 }
-.weather.hide { opacity:0; }
 
-.right {
-  position:absolute; right:20px; top:50%;
-  transform:translateY(-50%);
-  font-family:'Roboto'; font-size:14px; color:#aaa;
-  transition:.3s;
+/* MERCADO */
+.market{
+  width:230px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  gap:4px;
 }
-.right.hide { opacity:0; }
 
-/* glitch suave */
-.glitch { position:relative; }
-.glitch::before,.glitch::after {
-  content:"CURU"; position:absolute; left:0; opacity:.5;
+.market-row{
+  display:flex;
+  gap:6px;
+  font-variant-numeric: tabular-nums;
 }
-.glitch::before { color:#ff3c00; transform:translate(1px,-1px); }
-.glitch::after { color:#00ffff; transform:translate(-1px,1px); }
+
+.market-symbol{
+  font-size:12px;
+  opacity:0.7;
+}
+
+.market-value{
+  font-size:15px;
+  font-weight:600;
+}
+
+/* cores dinâmica */
+.up{ color:#0a8f2f; }
+.down{ color:#a30000; }
+
+/* RELÓGIO */
+.clock{
+  width:200px;
+  text-align:right;
+  font-family:'JetBrains Mono', monospace;
+}
+
+.day{font-size:12px;}
+.time{font-size:34px;}
+.sec{font-size:13px;opacity:0.6;}
+.date{font-size:12px;opacity:0.7;}
+
+*{color:#000;font-family:'Roboto';}
+
+/* TRANSIÇÃO SUAVE */
+.fade{
+  transition:opacity .3s ease, transform .3s ease;
+}
+.fade.out{
+  opacity:0;
+  transform:translateY(-6px);
+}
 </style>
 </head>
 
 <body>
 
 <div class="safe">
-  <div class="container">
-    <div class="card">
+  <div class="bar">
 
-      <div id="text" class="title audiowide">LIVEPX NA BIO</div>
-      <div id="weather" class="weather">São Paulo 25°C</div>
-      <div id="right" class="right">--:--</div>
-
+    <!-- CLIMA -->
+    <div class="weather">
+      <div class="weather-row">
+        <svg id="weatherIcon" class="icon" viewBox="0 0 24 24"></svg>
+        <div class="city" id="city">--</div>
+      </div>
+      <div class="temp fade" id="temp">--°C</div>
+      <div class="desc fade" id="desc">--</div>
     </div>
+
+    <!-- CENTRO -->
+    <div class="center">
+      <div class="title">LIVEPX NA BIO</div>
+    </div>
+
+    <!-- MERCADO -->
+    <div class="market" id="market"></div>
+
+    <!-- RELÓGIO -->
+    <div class="clock">
+      <div class="day" id="day">--</div>
+      <div>
+        <span class="time" id="time">--:--</span>
+        <span class="sec" id="sec">--</span>
+      </div>
+      <div class="date" id="date">--</div>
+    </div>
+
   </div>
 </div>
 
 <script>
-const API_KEY = "46f49c9551bea5305c63071f37f9622d";
+const API_KEY="46f49c9551bea5305c63071f37f9622d";
 
-/* ================= FALLBACK STATE ================= */
-let lastWeather = ["São Paulo 25°C"];
-let lastMarket = "BTC 300K • ETH 15K";
+/* ===== CLIMA ROTATIVO ===== */
+const cities=["Sao Paulo,BR","Rio de Janeiro,BR","Belo Horizonte,BR","Curitiba,BR"];
+let ci=0;
 
-/* ================= SCRAMBLE ================= */
-function scramble(el, text){
-  const chars="ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
-  let frame=0;
-
-  function run(){
-    let out="";
-    for(let i=0;i<text.length;i++){
-      out += i<frame ? text[i] : chars[Math.floor(Math.random()*chars.length)];
-    }
-    el.innerText=out;
-
-    if(frame<=text.length){
-      frame+=0.2;
-      requestAnimationFrame(run);
-    } else {
-      el.innerText=text;
-    }
-  }
-  run();
+function getIcon(code){
+  if(code.startsWith("01")) return '<circle cx="12" cy="12" r="4"/>';
+  if(code.startsWith("02")) return '<circle cx="10" cy="10" r="4"/><path d="M14 14h6"/>';
+  if(code.startsWith("03")||code.startsWith("04")) return '<rect x="5" y="10" width="14" height="5" rx="2"/>';
+  if(code.startsWith("09")||code.startsWith("10")) return '<path d="M6 14l2 4m4-4l2 4m4-4l2 4"/>';
+  return '<circle cx="12" cy="12" r="4"/>';
 }
-
-/* ================= TEXTO ================= */
-const textEl=document.getElementById("text");
-
-const texts=[
-  {html:"LIVEPX NA BIO",class:"audiowide",scramble:true},
-  {html:'cupom <span class="glitch">CURU</span> na tradeit.gg te dá descontos',class:"roboto small"}
-];
-
-let ti=0;
-
-setInterval(()=>{
-  textEl.classList.add("fade-out");
-
-  setTimeout(()=>{
-    ti=(ti+1)%texts.length;
-    textEl.className="title "+texts[ti].class;
-    textEl.innerHTML=texts[ti].html;
-    textEl.classList.remove("fade-out");
-
-    if(texts[ti].scramble){
-      scramble(textEl,"LIVEPX NA BIO");
-    }
-  },400);
-
-},6000);
-
-scramble(textEl,"LIVEPX NA BIO");
-
-/* ================= CLIMA COM FALLBACK ================= */
-const weatherEl=document.getElementById("weather");
-const cities=["Sao Paulo,BR","Rio de Janeiro,BR","Belo Horizonte,BR"];
-let wi=0;
 
 async function loadWeather(){
-  let tempData=[];
+  try{
+    const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${cities[ci]}&units=metric&appid=${API_KEY}&lang=pt_br`);
+    const d=await r.json();
 
-  for(const c of cities){
-    try{
-      const r=await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${c}&units=metric&appid=${API_KEY}`);
-      const d=await r.json();
+    city.innerText=d.name;
+    temp.innerText=Math.round(d.main.temp)+"°C";
+    desc.innerText=d.weather[0].description;
 
-      if(d?.main?.temp){
-        tempData.push(`${d.name} ${Math.round(d.main.temp)}°C`);
-      }
-    }catch{}
-  }
+    weatherIcon.innerHTML=getIcon(d.weather[0].icon);
 
-  if(tempData.length){
-    lastWeather = tempData; // atualiza só se válido
-  }
+  }catch{}
+
+  ci=(ci+1)%cities.length;
 }
 
-setInterval(()=>{
-  if(lastWeather.length){
-    wi=(wi+1)%lastWeather.length;
-    weatherEl.classList.add("hide");
+/* ===== MERCADO ===== */
+let prev={btc:null,eth:null};
 
-    setTimeout(()=>{
-      weatherEl.innerText=lastWeather[wi];
-      weatherEl.classList.remove("hide");
-    },200);
-  }
-},4000);
-
-/* ================= MERCADO COM FALLBACK ================= */
-const rightEl=document.getElementById("right");
-let showClock=true;
-
-function formatValue(v){
-  if(v>=1000) return (v/1000).toFixed(0)+"K";
+function format(v){
+  if(v>1000) return (v/1000).toFixed(0)+"K";
   return v;
 }
 
 async function loadMarket(){
   try{
-    const res=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl");
-    const d=await res.json();
+    const c=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl");
+    const cd=await c.json();
 
-    if(d?.bitcoin?.brl && d?.ethereum?.brl){
-      lastMarket = `BTC ${formatValue(d.bitcoin.brl)} • ETH ${formatValue(d.ethereum.brl)}`;
-    }
+    const fx=await fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL");
+    const fd=await fx.json();
 
+    const btc=cd.bitcoin.brl;
+    const eth=cd.ethereum.brl;
+
+    const btcClass=prev.btc && btc>prev.btc ? "up" : "down";
+    const ethClass=prev.eth && eth>prev.eth ? "up" : "down";
+
+    prev.btc=btc;
+    prev.eth=eth;
+
+    market.innerHTML=`
+      <div class="market-row ${btcClass}">
+        <span class="market-symbol">BTC</span>
+        <span class="market-value">R$ ${format(btc)}</span>
+      </div>
+      <div class="market-row ${ethClass}">
+        <span class="market-symbol">ETH</span>
+        <span class="market-value">R$ ${format(eth)}</span>
+      </div>
+      <div class="market-row">
+        <span class="market-symbol">USD</span>
+        <span class="market-value">R$ ${parseFloat(fd.USDBRL.bid).toFixed(2)}</span>
+      </div>
+    `;
   }catch{}
 }
 
-setInterval(()=>{
-  rightEl.classList.add("hide");
+/* ===== RELÓGIO ===== */
+function updateClock(){
+  const now=new Date();
 
-  setTimeout(()=>{
-    if(showClock){
-      const now=new Date();
-      rightEl.innerText=now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
-    } else {
-      rightEl.innerText=lastMarket; // fallback aqui
-    }
+  time.innerText=now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+  sec.innerText=now.getSeconds().toString().padStart(2,"0");
 
-    rightEl.classList.remove("hide");
-    showClock=!showClock;
-
-  },200);
-
-},4000);
+  day.innerText=now.toLocaleDateString("pt-BR",{weekday:"long"});
+  date.innerText=now.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
+}
 
 /* INIT */
 loadWeather();
 loadMarket();
+updateClock();
 
-setInterval(loadWeather,900000);
-setInterval(loadMarket,1200000);
+setInterval(updateClock,1000);
+setInterval(loadWeather,6000);
+setInterval(loadMarket,60000);
 </script>
 
 </body>
