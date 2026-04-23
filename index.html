@@ -96,11 +96,9 @@ html, body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  font-size: 24px;
-  letter-spacing: 2px;
   text-align: center;
 
-  color: #ff8c00; /* 🔥 neon */
+  color: #ff8c00;
 
   text-shadow:
     0 0 6px rgba(255,140,0,0.8),
@@ -114,8 +112,22 @@ html, body {
   transform: translate(-50%, -80%);
 }
 
-.audiowide { font-family: 'Audiowide'; }
-.roboto { font-family: 'Roboto'; }
+.audiowide {
+  font-family: 'Audiowide';
+  font-size: 24px;
+  letter-spacing: 2px;
+}
+
+.roboto {
+  font-family: 'Roboto';
+}
+
+/* 🔥 TEXTO MENOR */
+.small {
+  font-size: 18px;
+  letter-spacing: 1px;
+  opacity: 0.95;
+}
 
 /* CLIMA */
 .weather {
@@ -128,7 +140,6 @@ html, body {
   color: #ccc;
   transition: opacity .3s ease;
 }
-
 .weather.hide { opacity: 0; }
 
 /* DIREITA */
@@ -142,7 +153,6 @@ html, body {
   color: #aaa;
   transition: opacity .3s ease;
 }
-
 .right.hide { opacity: 0; }
 
 /* GLITCH SUAVE */
@@ -150,7 +160,6 @@ html, body {
   position: relative;
   display: inline-block;
 }
-
 .glitch::before,
 .glitch::after {
   content: "CURU";
@@ -158,19 +167,16 @@ html, body {
   left: 0;
   opacity: 0.5;
 }
-
 .glitch::before {
   color: #ff3c00;
   transform: translate(1px,-1px);
   animation: glitch1 0.4s infinite;
 }
-
 .glitch::after {
   color: #00ffff;
   transform: translate(-1px,1px);
   animation: glitch2 0.4s infinite;
 }
-
 @keyframes glitch1 { 50% { transform: translate(-1px,1px); } }
 @keyframes glitch2 { 50% { transform: translate(1px,-1px); } }
 </style>
@@ -220,7 +226,10 @@ const textEl=document.getElementById("text");
 
 const texts=[
   {html:"LIVEPX NA BIO",class:"audiowide",scramble:true},
-  {html:'cupom <span class="glitch">CURU</span> na tradeit.gg te dá descontos',class:"roboto"}
+  {
+    html:'cupom <span class="glitch">CURU</span> na tradeit.gg te dá descontos',
+    class:"roboto small"
+  }
 ];
 
 let ti=0;
@@ -272,11 +281,27 @@ setInterval(()=>{
   }
 },4000);
 
-/* DIREITA: RELÓGIO + MERCADO */
+/* MERCADO + RELÓGIO */
 const rightEl=document.getElementById("right");
 
 let showClock=true;
-let marketText="BTC 345K • ETH 18K";
+let marketText="—";
+
+function formatValue(v){
+  if(v>=1000) return (v/1000).toFixed(0)+"K";
+  return v;
+}
+
+async function loadMarket(){
+  try{
+    const res=await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl");
+    const d=await res.json();
+
+    marketText=`BTC ${formatValue(d.bitcoin.brl)} • ETH ${formatValue(d.ethereum.brl)}`;
+  }catch{
+    marketText="indisponível";
+  }
+}
 
 setInterval(()=>{
   rightEl.classList.add("hide");
@@ -296,7 +321,10 @@ setInterval(()=>{
 
 /* INIT */
 loadWeather();
+loadMarket();
+
 setInterval(loadWeather,900000);
+setInterval(loadMarket,1200000);
 </script>
 
 </body>
