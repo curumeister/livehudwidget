@@ -15,10 +15,12 @@ html,body{
 .safe{
   width:100%;
   height:100%;
+
   padding:clamp(28px,5vh,70px) clamp(24px,5vw,70px);
+
   display:flex;
-  align-items:flex-end;
   justify-content:center;
+  align-items:flex-start; /* 🔥 AGORA FICA NO TOPO */
 }
 
 .bar{
@@ -36,20 +38,13 @@ html,body{
   gap:18px;
 
   box-shadow:0 8px 24px rgba(0,0,0,0.35);
+
+  margin-top:clamp(10px,2vh,30px); /* 🔧 ajuste fino topo */
 }
 
 /* CLIMA */
-.weather{
-  width:200px;
-  display:flex;
-  flex-direction:column;
-}
-
-.weather-row{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
+.weather{ width:200px; display:flex; flex-direction:column; }
+.weather-row{ display:flex; align-items:center; gap:8px; }
 
 .icon{
   width:20px;
@@ -59,20 +54,13 @@ html,body{
   fill:none;
 }
 
-.city{font-size:13px;}
+.city{font-size:13px; opacity:.8;}
 .temp{font-size:26px;font-weight:700;}
 .desc{font-size:12px;opacity:0.7;}
 
 /* CENTRO */
-.center{
-  flex:1;
-  text-align:center;
-}
-
-.title{
-  font-family:'Audiowide';
-  font-size:28px;
-}
+.center{ flex:1; text-align:center; }
+.title{ font-family:'Audiowide'; font-size:28px; }
 
 /* MERCADO */
 .market{
@@ -89,17 +77,9 @@ html,body{
   font-variant-numeric: tabular-nums;
 }
 
-.market-symbol{
-  font-size:12px;
-  opacity:0.7;
-}
+.market-symbol{ font-size:12px; opacity:0.6; }
+.market-value{ font-size:15px; font-weight:600; }
 
-.market-value{
-  font-size:15px;
-  font-weight:600;
-}
-
-/* cores dinâmica */
 .up{ color:#0a8f2f; }
 .down{ color:#a30000; }
 
@@ -117,9 +97,9 @@ html,body{
 
 *{color:#000;font-family:'Roboto';}
 
-/* TRANSIÇÃO SUAVE */
+/* ANIMAÇÃO */
 .fade{
-  transition:opacity .3s ease, transform .3s ease;
+  transition:opacity .25s ease, transform .25s ease;
 }
 .fade.out{
   opacity:0;
@@ -133,7 +113,6 @@ html,body{
 <div class="safe">
   <div class="bar">
 
-    <!-- CLIMA -->
     <div class="weather">
       <div class="weather-row">
         <svg id="weatherIcon" class="icon" viewBox="0 0 24 24"></svg>
@@ -143,15 +122,25 @@ html,body{
       <div class="desc fade" id="desc">--</div>
     </div>
 
-    <!-- CENTRO -->
     <div class="center">
       <div class="title">LIVEPX NA BIO</div>
     </div>
 
-    <!-- MERCADO -->
-    <div class="market" id="market"></div>
+    <div class="market">
+      <div class="market-row" id="btcRow">
+        <span class="market-symbol">BTC</span>
+        <span class="market-value" id="btc">--</span>
+      </div>
+      <div class="market-row" id="ethRow">
+        <span class="market-symbol">ETH</span>
+        <span class="market-value" id="eth">--</span>
+      </div>
+      <div class="market-row">
+        <span class="market-symbol">USD</span>
+        <span class="market-value" id="usd">--</span>
+      </div>
+    </div>
 
-    <!-- RELÓGIO -->
     <div class="clock">
       <div class="day" id="day">--</div>
       <div>
@@ -165,11 +154,19 @@ html,body{
 </div>
 
 <script>
-const API_KEY="46f49c9551bea5305c63071f37f9622d";
+const API_KEY="SUA_API_AQUI";
 
-/* ===== CLIMA ROTATIVO ===== */
-const cities=["Sao Paulo,BR","Rio de Janeiro,BR","Belo Horizonte,BR","Curitiba,BR"];
+const cities=["Sao Paulo,BR","Rio de Janeiro,BR","Curitiba,BR"];
 let ci=0;
+let prev={btc:null,eth:null};
+
+function swap(el,val){
+  el.classList.add("out");
+  setTimeout(()=>{
+    el.innerText=val;
+    el.classList.remove("out");
+  },120);
+}
 
 function getIcon(code){
   if(code.startsWith("01")) return '<circle cx="12" cy="12" r="4"/>';
@@ -185,18 +182,14 @@ async function loadWeather(){
     const d=await r.json();
 
     city.innerText=d.name;
-    temp.innerText=Math.round(d.main.temp)+"°C";
-    desc.innerText=d.weather[0].description;
-
+    swap(temp, Math.round(d.main.temp)+"°C");
+    swap(desc, d.weather[0].description);
     weatherIcon.innerHTML=getIcon(d.weather[0].icon);
 
   }catch{}
 
   ci=(ci+1)%cities.length;
 }
-
-/* ===== MERCADO ===== */
-let prev={btc:null,eth:null};
 
 function format(v){
   if(v>1000) return (v/1000).toFixed(0)+"K";
@@ -214,47 +207,34 @@ async function loadMarket(){
     const btc=cd.bitcoin.brl;
     const eth=cd.ethereum.brl;
 
-    const btcClass=prev.btc && btc>prev.btc ? "up" : "down";
-    const ethClass=prev.eth && eth>prev.eth ? "up" : "down";
+    btcRow.className="market-row " + (prev.btc===null ? "" : (btc>prev.btc?"up":"down"));
+    ethRow.className="market-row " + (prev.eth===null ? "" : (eth>prev.eth?"up":"down"));
+
+    document.getElementById("btc").innerText="R$ "+format(btc);
+    document.getElementById("eth").innerText="R$ "+format(eth);
+    document.getElementById("usd").innerText="R$ "+parseFloat(fd.USDBRL.bid).toFixed(2);
 
     prev.btc=btc;
     prev.eth=eth;
 
-    market.innerHTML=`
-      <div class="market-row ${btcClass}">
-        <span class="market-symbol">BTC</span>
-        <span class="market-value">R$ ${format(btc)}</span>
-      </div>
-      <div class="market-row ${ethClass}">
-        <span class="market-symbol">ETH</span>
-        <span class="market-value">R$ ${format(eth)}</span>
-      </div>
-      <div class="market-row">
-        <span class="market-symbol">USD</span>
-        <span class="market-value">R$ ${parseFloat(fd.USDBRL.bid).toFixed(2)}</span>
-      </div>
-    `;
   }catch{}
 }
 
-/* ===== RELÓGIO ===== */
 function updateClock(){
   const now=new Date();
 
   time.innerText=now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
   sec.innerText=now.getSeconds().toString().padStart(2,"0");
-
   day.innerText=now.toLocaleDateString("pt-BR",{weekday:"long"});
   date.innerText=now.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
 }
 
-/* INIT */
 loadWeather();
 loadMarket();
 updateClock();
 
 setInterval(updateClock,1000);
-setInterval(loadWeather,6000);
+setInterval(loadWeather,30000);
 setInterval(loadMarket,60000);
 </script>
 
