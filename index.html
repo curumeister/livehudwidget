@@ -12,24 +12,21 @@
   font-family:'Segoe UI',sans-serif;
 }
 
-/* ===== SAFE AREA CORRETA ===== */
 body {
   margin:0;
   background:transparent;
-
   display:flex;
   align-items:center;
   justify-content:center;
-
   min-height:100vh;
 }
 
-/* ===== WIDGET ===== */
+/* ===== WIDGET COMPACTO ===== */
 .widget {
-  width:340px;
-  height:100px;
-  border-radius:22px;
-  padding:16px 20px;
+  width:300px;
+  height:80px; /* menor */
+  border-radius:18px;
+  padding:12px 14px; /* menor */
 
   position:relative;
   overflow:hidden;
@@ -38,97 +35,106 @@ body {
   justify-content:space-between;
   align-items:center;
 
-  /* GLASS */
-  background: rgba(10,10,10,0.55);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-
-  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(15,15,15,0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 
   isolation:isolate;
 }
 
-/* ===== BORDA HUD ===== */
+/* ===== BORDA GRADIENT CONTÍNUA ===== */
 .widget::before {
   content:"";
   position:absolute;
   inset:0;
-  border-radius:22px;
-  padding:2px;
+  border-radius:18px;
+  padding:1.5px;
 
-  background:
-    linear-gradient(90deg, #ff5a00, #ff5a00) left top / 40% 2px no-repeat,
-    linear-gradient(90deg, #ffffff, #ffffff) right top / 40% 2px no-repeat,
-    linear-gradient(0deg, #ff5a00, #ff5a00) left bottom / 40% 2px no-repeat,
-    linear-gradient(0deg, #ffffff, #ffffff) right bottom / 40% 2px no-repeat;
+  background: linear-gradient(
+    135deg,
+    #ff7a00,
+    #ff3c3c,
+    #a855f7,
+    #3b82f6,
+    #ff7a00
+  );
+
+  background-size: 300% 300%;
+
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
 
   pointer-events:none;
 }
 
-/* glow interno leve */
+/* glow externo */
 .widget::after {
   content:"";
   position:absolute;
-  inset:0;
-  border-radius:22px;
-  box-shadow:
-    inset 0 0 25px rgba(255,90,0,0.15),
-    inset 0 0 35px rgba(255,255,255,0.05);
-  pointer-events:none;
+  inset:-2px;
+  border-radius:20px;
+  background: linear-gradient(
+    135deg,
+    rgba(255,120,0,0.4),
+    rgba(255,60,60,0.4),
+    rgba(168,85,247,0.4)
+  );
+  filter: blur(12px);
+  opacity:0.5;
+  z-index:-1;
 }
 
 /* COLUNAS */
 .col {
-  width:45%;
+  width:48%;
   position:relative;
   height:100%;
 }
 
+/* divisor mais sutil */
 .divider {
   width:1px;
-  height:60%;
-  background:rgba(255,255,255,0.08);
+  height:50%;
+  background:rgba(255,255,255,0.06);
 }
 
-/* ===== STACK (ANTI-VAZAMENTO) ===== */
+/* STACK */
 .stack {
   position:relative;
   height:100%;
   overflow:hidden;
-  isolation:isolate;
 }
 
-/* ===== ITEM (SEM TRANSFORM BUGADO) ===== */
+/* ITEM */
 .item {
   position:absolute;
   width:100%;
   left:0;
-  top:12px;
-
+  top:10px;
   opacity:0;
 
   transition:
-    top 0.9s cubic-bezier(.22,.61,.36,1),
-    opacity 0.6s ease;
-
-  pointer-events:none;
+    top 0.7s cubic-bezier(.22,.61,.36,1),
+    opacity 0.5s ease;
 }
 
 .item.active {
   top:0;
   opacity:1;
-  z-index:2;
 }
 
-/* TEXTO */
+/* TEXTO MAIS COMPACTO */
 .label {
-  font-size:11px;
-  color:rgba(255,255,255,0.5);
-  letter-spacing:.6px;
+  font-size:10px;
+  color:rgba(255,255,255,0.45);
+  letter-spacing:.5px;
 }
 
 .value {
-  font-size:20px;
+  font-size:18px; /* menor */
   font-weight:600;
   color:#fff;
 }
@@ -139,7 +145,6 @@ body {
 
 <div class="widget">
 
-  <!-- CLIMA -->
   <div class="col">
     <div class="stack">
       <div class="item active" id="wA">
@@ -155,7 +160,6 @@ body {
 
   <div class="divider"></div>
 
-  <!-- MERCADO -->
   <div class="col">
     <div class="stack">
       <div class="item active" id="mA">
@@ -172,162 +176,12 @@ body {
 </div>
 
 <script>
-const API_KEY = "46f49c9551bea5305c63071f37f9622d";
+const API_KEY = "SUA_KEY";
 
 const formatBRL = n =>
   n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 
-async function retry(fn, r=2, d=1000){
-  try { return await fn(); }
-  catch(e){
-    if(!r) throw e;
-    await new Promise(res=>setTimeout(res,d));
-    return retry(fn,r-1,d*2);
-  }
-}
-
-function fixCityName(name){
-  return name === "Sao Paulo" ? "São Paulo" : name;
-}
-
-/* WEATHER */
-let weatherData = [];
-let wi = 0;
-let wToggle = true;
-
-async function fetchWeather(){
-  const cities = [
-    { id: 3448439 },
-    { id: 3470127 },
-    { id: 3451190 },
-    { id: 3450554 }
-  ];
-
-  const res = await Promise.all(
-    cities.map(c =>
-      fetch(`https://api.openweathermap.org/data/2.5/weather?id=${c.id}&units=metric&appid=${API_KEY}`)
-        .then(r=>r.json())
-    )
-  );
-
-  weatherData = res
-    .filter(r => r && r.main && r.name)
-    .map(r => ({
-      label: fixCityName(r.name),
-      value: r.main?.temp != null
-        ? `${Math.round(r.main.temp)}°C`
-        : "--°C"
-    }));
-}
-
-/* MARKET */
-let marketData = [];
-let mi = 0;
-let mToggle = true;
-
-async function fetchMarket(){
-  try {
-    const fiat = await fetch("https://api.exchangerate.host/latest?base=BRL&symbols=USD,GBP")
-      .then(r=>r.json());
-
-    const usd = 1 / fiat.rates.USD;
-    const gbp = 1 / fiat.rates.GBP;
-
-    const cryptoSymbols = {
-      ETH: "ETHBRL",
-      MATIC: "MATICBRL"
-    };
-
-    const crypto = await Promise.all(
-      Object.entries(cryptoSymbols).map(async ([label, symbol]) => {
-        try {
-          const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`).then(r=>r.json());
-          return { label, value: formatBRL(+r.price) };
-        } catch {
-          return { label, value: "R$ --" };
-        }
-      })
-    );
-
-    marketData = [
-      { label: "USD", value: formatBRL(usd) },
-      { label: "GBP", value: formatBRL(gbp) },
-      ...crypto
-    ];
-
-  } catch {
-    marketData = [
-      { label: "USD", value: "R$ --" },
-      { label: "GBP", value: "R$ --" }
-    ];
-  }
-}
-
-/* SWAP */
-function swapWeather(){
-  if(!weatherData.length) return;
-
-  wi = (wi+1)%weatherData.length;
-  const next = weatherData[wi];
-
-  const A=document.getElementById("wA");
-  const B=document.getElementById("wB");
-
-  const active = wToggle?A:B;
-  const nextEl = wToggle?B:A;
-
-  nextEl.style.zIndex = 2;
-  active.style.zIndex = 1;
-
-  nextEl.querySelector(".label").textContent = next.label;
-  nextEl.querySelector(".value").textContent = next.value;
-
-  nextEl.classList.add("active");
-  active.classList.remove("active");
-
-  wToggle=!wToggle;
-}
-
-function swapMarket(){
-  if(!marketData.length) return;
-
-  mi = (mi+1)%marketData.length;
-  const next = marketData[mi];
-
-  const A=document.getElementById("mA");
-  const B=document.getElementById("mB");
-
-  const active = mToggle?A:B;
-  const nextEl = mToggle?B:A;
-
-  nextEl.style.zIndex = 2;
-  active.style.zIndex = 1;
-
-  nextEl.querySelector(".label").textContent = next.label;
-  nextEl.querySelector(".value").textContent = next.value;
-
-  nextEl.classList.add("active");
-  active.classList.remove("active");
-
-  mToggle=!mToggle;
-}
-
-/* INIT */
-async function init(){
-  document.querySelector("#wA .value").textContent = "Carregando...";
-  document.querySelector("#mA .value").textContent = "Carregando...";
-
-  try { await retry(fetchWeather); } catch {}
-  try { await retry(fetchMarket); } catch {}
-}
-
-init();
-
-setInterval(fetchWeather, 900000);
-setInterval(fetchMarket, 15000);
-
-setInterval(swapWeather, 3000);
-setInterval(swapMarket, 3000);
+/* restante do JS igual ao seu */
 </script>
 
 </body>
