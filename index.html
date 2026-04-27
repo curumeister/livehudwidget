@@ -16,7 +16,7 @@ body {
   min-height:100vh;
 }
 
-/* WIDGET COMPACTO */
+/* ===== WIDGET COMPACTO ===== */
 .widget {
   width:300px;
   height:80px;
@@ -36,7 +36,7 @@ body {
   isolation:isolate;
 }
 
-/* BORDA GRADIENT */
+/* ===== BORDA GRADIENT ===== */
 .widget::before {
   content:"";
   position:absolute;
@@ -121,6 +121,7 @@ body {
 
 <div class="widget">
 
+  <!-- CLIMA -->
   <div class="col">
     <div class="stack">
       <div class="item active" id="wA">
@@ -136,6 +137,7 @@ body {
 
   <div class="divider"></div>
 
+  <!-- MERCADO -->
   <div class="col">
     <div class="stack">
       <div class="item active" id="mA">
@@ -163,7 +165,12 @@ let wi = 0;
 let wToggle = true;
 
 async function fetchWeather(){
-  const cities = [{ id: 3448439 }];
+  const cities = [
+    { id: 3448439 }, // São Paulo
+    { id: 3470127 }, // Rio
+    { id: 3451190 }, // BH
+    { id: 3450554 }  // Salvador
+  ];
 
   const res = await Promise.all(
     cities.map(c =>
@@ -184,18 +191,44 @@ let mi = 0;
 let mToggle = true;
 
 async function fetchMarket(){
-  const r = await fetch("https://api.exchangerate.host/latest?base=BRL&symbols=USD,GBP").then(r=>r.json());
+  try {
+    const fiat = await fetch("https://api.exchangerate.host/latest?base=BRL&symbols=USD,GBP")
+      .then(r=>r.json());
 
-  marketData = [
-    { label: "USD", value: formatBRL(1 / r.rates.USD) },
-    { label: "GBP", value: formatBRL(1 / r.rates.GBP) }
-  ];
+    const cryptoSymbols = {
+      ETH: "ETHBRL",
+      MATIC: "MATICBRL"
+    };
+
+    const crypto = await Promise.all(
+      Object.entries(cryptoSymbols).map(async ([label, symbol]) => {
+        try {
+          const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`).then(r=>r.json());
+          return { label, value: formatBRL(+r.price) };
+        } catch {
+          return { label, value: "R$ --" };
+        }
+      })
+    );
+
+    marketData = [
+      { label: "USD", value: formatBRL(1 / fiat.rates.USD) },
+      { label: "GBP", value: formatBRL(1 / fiat.rates.GBP) },
+      ...crypto
+    ];
+  } catch {
+    marketData = [
+      { label: "USD", value: "R$ --" },
+      { label: "GBP", value: "R$ --" }
+    ];
+  }
 }
 
 /* SWAP */
 function swapWeather(){
   if(!weatherData.length) return;
 
+  wi = (wi+1)%weatherData.length;
   const next = weatherData[wi];
 
   const A=document.getElementById("wA");
@@ -216,6 +249,7 @@ function swapWeather(){
 function swapMarket(){
   if(!marketData.length) return;
 
+  mi = (mi+1)%marketData.length;
   const next = marketData[mi];
 
   const A=document.getElementById("mA");
