@@ -5,12 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI',sans-serif;
-}
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
 
 body {
   margin:0;
@@ -21,12 +16,12 @@ body {
   min-height:100vh;
 }
 
-/* ===== WIDGET COMPACTO ===== */
+/* WIDGET COMPACTO */
 .widget {
   width:300px;
-  height:80px; /* menor */
+  height:80px;
   border-radius:18px;
-  padding:12px 14px; /* menor */
+  padding:12px 14px;
 
   position:relative;
   overflow:hidden;
@@ -37,12 +32,11 @@ body {
 
   background: rgba(15,15,15,0.55);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 
   isolation:isolate;
 }
 
-/* ===== BORDA GRADIENT CONTÍNUA ===== */
+/* BORDA GRADIENT */
 .widget::before {
   content:"";
   position:absolute;
@@ -59,18 +53,13 @@ body {
     #ff7a00
   );
 
-  background-size: 300% 300%;
-
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
-
-  pointer-events:none;
 }
 
-/* glow externo */
 .widget::after {
   content:"";
   position:absolute;
@@ -87,38 +76,27 @@ body {
   z-index:-1;
 }
 
-/* COLUNAS */
-.col {
-  width:48%;
-  position:relative;
-  height:100%;
-}
+.col { width:48%; position:relative; height:100%; }
 
-/* divisor mais sutil */
 .divider {
   width:1px;
   height:50%;
   background:rgba(255,255,255,0.06);
 }
 
-/* STACK */
 .stack {
   position:relative;
   height:100%;
   overflow:hidden;
 }
 
-/* ITEM */
 .item {
   position:absolute;
   width:100%;
   left:0;
   top:10px;
   opacity:0;
-
-  transition:
-    top 0.7s cubic-bezier(.22,.61,.36,1),
-    opacity 0.5s ease;
+  transition: top 0.7s cubic-bezier(.22,.61,.36,1), opacity 0.5s ease;
 }
 
 .item.active {
@@ -126,15 +104,13 @@ body {
   opacity:1;
 }
 
-/* TEXTO MAIS COMPACTO */
 .label {
   font-size:10px;
   color:rgba(255,255,255,0.45);
-  letter-spacing:.5px;
 }
 
 .value {
-  font-size:18px; /* menor */
+  font-size:18px;
   font-weight:600;
   color:#fff;
 }
@@ -176,12 +152,99 @@ body {
 </div>
 
 <script>
-const API_KEY = "SUA_KEY";
+const API_KEY = "46f49c9551bea5305c63071f37f9622d";
 
 const formatBRL = n =>
   n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 
-/* restante do JS igual ao seu */
+/* WEATHER */
+let weatherData = [];
+let wi = 0;
+let wToggle = true;
+
+async function fetchWeather(){
+  const cities = [{ id: 3448439 }];
+
+  const res = await Promise.all(
+    cities.map(c =>
+      fetch(`https://api.openweathermap.org/data/2.5/weather?id=${c.id}&units=metric&appid=${API_KEY}`)
+        .then(r=>r.json())
+    )
+  );
+
+  weatherData = res.map(r => ({
+    label: r.name,
+    value: `${Math.round(r.main.temp)}°C`
+  }));
+}
+
+/* MARKET */
+let marketData = [];
+let mi = 0;
+let mToggle = true;
+
+async function fetchMarket(){
+  const r = await fetch("https://api.exchangerate.host/latest?base=BRL&symbols=USD,GBP").then(r=>r.json());
+
+  marketData = [
+    { label: "USD", value: formatBRL(1 / r.rates.USD) },
+    { label: "GBP", value: formatBRL(1 / r.rates.GBP) }
+  ];
+}
+
+/* SWAP */
+function swapWeather(){
+  if(!weatherData.length) return;
+
+  const next = weatherData[wi];
+
+  const A=document.getElementById("wA");
+  const B=document.getElementById("wB");
+
+  const active = wToggle?A:B;
+  const nextEl = wToggle?B:A;
+
+  nextEl.querySelector(".label").textContent = next.label;
+  nextEl.querySelector(".value").textContent = next.value;
+
+  nextEl.classList.add("active");
+  active.classList.remove("active");
+
+  wToggle=!wToggle;
+}
+
+function swapMarket(){
+  if(!marketData.length) return;
+
+  const next = marketData[mi];
+
+  const A=document.getElementById("mA");
+  const B=document.getElementById("mB");
+
+  const active = mToggle?A:B;
+  const nextEl = mToggle?B:A;
+
+  nextEl.querySelector(".label").textContent = next.label;
+  nextEl.querySelector(".value").textContent = next.value;
+
+  nextEl.classList.add("active");
+  active.classList.remove("active");
+
+  mToggle=!mToggle;
+}
+
+/* INIT */
+async function init(){
+  await fetchWeather();
+  await fetchMarket();
+}
+
+init();
+
+setInterval(fetchWeather, 900000);
+setInterval(fetchMarket, 15000);
+setInterval(swapWeather, 3000);
+setInterval(swapMarket, 3000);
 </script>
 
 </body>
