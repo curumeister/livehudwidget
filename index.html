@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
 
 body {
   margin:0;
@@ -19,12 +24,8 @@ body {
 /* ===== WIDGET COMPACTO ===== */
 .widget {
   width:300px;
-  height:80px;
-  border-radius:18px;
-  padding:12px 14px;
-
-  position:relative;
-  overflow:hidden;
+  padding:8px 12px;
+  border-radius:16px;
 
   display:flex;
   justify-content:space-between;
@@ -33,16 +34,17 @@ body {
   background: rgba(15,15,15,0.55);
   backdrop-filter: blur(10px);
 
-  isolation:isolate;
+  position:relative;
+  overflow:hidden;
 }
 
-/* ===== BORDA GRADIENT ===== */
+/* BORDA GRADIENT */
 .widget::before {
   content:"";
   position:absolute;
   inset:0;
-  border-radius:18px;
-  padding:1.5px;
+  border-radius:16px;
+  padding:1px;
 
   background: linear-gradient(
     135deg,
@@ -60,59 +62,52 @@ body {
           mask-composite: exclude;
 }
 
-.widget::after {
-  content:"";
-  position:absolute;
-  inset:-2px;
-  border-radius:20px;
-  background: linear-gradient(
-    135deg,
-    rgba(255,120,0,0.4),
-    rgba(255,60,60,0.4),
-    rgba(168,85,247,0.4)
-  );
-  filter: blur(12px);
-  opacity:0.5;
-  z-index:-1;
+/* COLUNAS */
+.col {
+  width:48%;
+  position:relative;
 }
 
-.col { width:48%; position:relative; height:100%; }
-
-.divider {
-  width:1px;
-  height:50%;
-  background:rgba(255,255,255,0.06);
-}
-
+/* STACK */
 .stack {
   position:relative;
-  height:100%;
-  overflow:hidden;
+  height:20px;
 }
 
+/* ITEM */
 .item {
   position:absolute;
-  width:100%;
-  left:0;
-  top:10px;
+  inset:0;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
   opacity:0;
-  transition: top 0.7s cubic-bezier(.22,.61,.36,1), opacity 0.5s ease;
+  transition: opacity 0.4s ease;
 }
 
 .item.active {
-  top:0;
   opacity:1;
 }
 
+/* TEXTO */
 .label {
-  font-size:10px;
-  color:rgba(255,255,255,0.45);
+  font-size:11px;
+  color:rgba(255,255,255,0.5);
 }
 
 .value {
-  font-size:18px;
+  font-size:16px;
   font-weight:600;
   color:#fff;
+}
+
+/* divisor */
+.divider {
+  width:1px;
+  height:20px;
+  background:rgba(255,255,255,0.08);
 }
 </style>
 </head>
@@ -125,7 +120,7 @@ body {
   <div class="col">
     <div class="stack">
       <div class="item active" id="wA">
-        <div class="label">Clima</div>
+        <div class="label">Cidade</div>
         <div class="value">--°C</div>
       </div>
       <div class="item" id="wB">
@@ -166,10 +161,10 @@ let wToggle = true;
 
 async function fetchWeather(){
   const cities = [
-    { id: 3448439 }, // São Paulo
-    { id: 3470127 }, // Rio
-    { id: 3451190 }, // BH
-    { id: 3450554 }  // Salvador
+    { id: 3448439 },
+    { id: 3470127 },
+    { id: 3451190 },
+    { id: 3450554 }
   ];
 
   const res = await Promise.all(
@@ -216,6 +211,7 @@ async function fetchMarket(){
       { label: "GBP", value: formatBRL(1 / fiat.rates.GBP) },
       ...crypto
     ];
+
   } catch {
     marketData = [
       { label: "USD", value: "R$ --" },
