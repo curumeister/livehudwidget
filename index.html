@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -5,14 +6,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI',sans-serif; }
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI',sans-serif;
+}
 
-/* ===== CORREÇÃO GLOBAL ===== */
-html, body {
-  width:100%;
-  height:100%;
-  overflow:hidden; /* impede qualquer vazamento externo */
+/* ===== SAFE AREA CORRETA ===== */
+body {
+  margin:0;
   background:transparent;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  min-height:100vh;
 }
 
 /* ===== WIDGET ===== */
@@ -29,13 +39,14 @@ html, body {
   justify-content:space-between;
   align-items:center;
 
+  /* GLASS */
   background: rgba(10,10,10,0.55);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 
   border: 1px solid rgba(255,255,255,0.06);
 
-  contain: layout paint; /* sandbox de render */
+  isolation:isolate;
 }
 
 /* ===== BORDA HUD ===== */
@@ -55,7 +66,7 @@ html, body {
   pointer-events:none;
 }
 
-/* glow interno */
+/* glow interno leve */
 .widget::after {
   content:"";
   position:absolute;
@@ -80,7 +91,7 @@ html, body {
   background:rgba(255,255,255,0.08);
 }
 
-/* ===== STACK FIX ===== */
+/* ===== STACK (ANTI-VAZAMENTO) ===== */
 .stack {
   position:relative;
   height:100%;
@@ -88,7 +99,7 @@ html, body {
   isolation:isolate;
 }
 
-/* ===== ITEM (SEM TRANSFORM) ===== */
+/* ===== ITEM (SEM TRANSFORM BUGADO) ===== */
 .item {
   position:absolute;
   width:100%;
@@ -322,3 +333,4 @@ setInterval(swapMarket, 3000);
 
 </body>
 </html>
+```
