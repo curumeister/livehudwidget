@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -15,25 +16,20 @@ body {
   justify-content:center;
 }
 
-/* ===== WIDGET ===== */
 .widget {
   width:340px;
   height:100px;
   border-radius:22px;
   padding:16px 20px;
-
   position:relative;
   overflow:hidden;
-
   display:flex;
   justify-content:space-between;
   align-items:center;
-
   background: linear-gradient(145deg, #111, #0b0b0b);
   border: 1px solid rgba(255,255,255,0.06);
 }
 
-/* GLOW EXTERNO */
 .widget::before {
   content:"";
   position:absolute;
@@ -52,30 +48,18 @@ body {
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
-  pointer-events:none;
 }
 
-/* BRILHO INTERNO SUAVE */
 .widget::after {
   content:"";
   position:absolute;
   inset:0;
   border-radius:22px;
-  background: radial-gradient(
-    circle at 85% 50%,
-    rgba(255,120,0,0.25),
-    transparent 60%
-  );
+  background: radial-gradient(circle at 85% 50%, rgba(255,120,0,0.25), transparent 60%);
   opacity:0.6;
-  pointer-events:none;
 }
 
-/* COLUNAS */
-.col {
-  width:45%;
-  position:relative;
-  height:100%;
-}
+.col { width:45%; position:relative; height:100%; }
 
 .divider {
   width:1px;
@@ -83,26 +67,21 @@ body {
   background:rgba(255,255,255,0.08);
 }
 
-/* STACK */
-.stack {
-  position:relative;
-  height:100%;
-}
+.stack { position:relative; height:100%; }
 
 .item {
   position:absolute;
   width:100%;
   opacity:0;
   transform:translateY(10px) scale(0.97);
+  transition: all 0.9s cubic-bezier(.22,.61,.36,1);
 }
 
 .item.active {
   opacity:1;
   transform:translateY(0) scale(1);
-  transition:all .55s cubic-bezier(.22,.61,.36,1);
 }
 
-/* TEXTO */
 .label {
   font-size:11px;
   color:rgba(255,255,255,0.45);
@@ -114,8 +93,6 @@ body {
   font-weight:600;
   color:#fff;
 }
-
-/* ================= JS ================= */
 </style>
 </head>
 
@@ -123,27 +100,31 @@ body {
 
 <div class="widget">
 
-  <!-- CLIMA -->
   <div class="col">
     <div class="stack">
       <div class="item active" id="wA">
         <div class="label">Clima</div>
         <div class="value">--°C</div>
       </div>
-      <div class="item" id="wB"></div>
+      <div class="item" id="wB">
+        <div class="label"></div>
+        <div class="value"></div>
+      </div>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- MERCADO -->
   <div class="col">
     <div class="stack">
       <div class="item active" id="mA">
         <div class="label">USD</div>
         <div class="value">R$ --</div>
       </div>
-      <div class="item" id="mB"></div>
+      <div class="item" id="mB">
+        <div class="label"></div>
+        <div class="value"></div>
+      </div>
     </div>
   </div>
 
@@ -155,7 +136,6 @@ const API_KEY = "46f49c9551bea5305c63071f37f9622d";
 const formatBRL = n =>
   n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 
-/* retry */
 async function retry(fn, r=2, d=1000){
   try { return await fn(); }
   catch(e){
@@ -165,7 +145,6 @@ async function retry(fn, r=2, d=1000){
   }
 }
 
-/* cidade */
 function fixCityName(name){
   return name === "Sao Paulo" ? "São Paulo" : name;
 }
@@ -190,38 +169,57 @@ async function fetchWeather(){
     )
   );
 
-  weatherData = res.map(r=>({
-    label: fixCityName(r.name),
-    value: `${Math.round(r.main?.temp ?? 0)}°C`
-  }));
+  weatherData = res
+    .filter(r => r && r.main && r.name)
+    .map(r => ({
+      label: fixCityName(r.name),
+      value: r.main?.temp != null
+        ? `${Math.round(r.main.temp)}°C`
+        : "--°C"
+    }));
 }
 
-/* MARKET */
+/* MARKET (FIAT + CRYPTO) */
 let marketData = [];
 let mi = 0;
 let mToggle = true;
 
 async function fetchMarket(){
-  const symbols = {
-    USD: "USDTBRL",
-    ETH: "ETHBRL",
-    MATIC: "MATICBRL"
-  };
+  try {
+    const fiat = await fetch("https://api.exchangerate.host/latest?base=BRL&symbols=USD,GBP")
+      .then(r=>r.json());
 
-  const entries = await Promise.all(
-    Object.entries(symbols).map(async ([label, symbol]) => {
-      try {
-        const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`).then(r=>r.json());
-        if (!r.price) throw new Error();
-        return { label, value: formatBRL(+r.price) };
-      } catch {
-        return { label, value: "R$ --" };
-      }
-    })
-  );
+    const usd = 1 / fiat.rates.USD;
+    const gbp = 1 / fiat.rates.GBP;
 
-  entries.push({ label: "NU", value: "R$ --" });
-  marketData = entries;
+    const cryptoSymbols = {
+      ETH: "ETHBRL",
+      MATIC: "MATICBRL"
+    };
+
+    const crypto = await Promise.all(
+      Object.entries(cryptoSymbols).map(async ([label, symbol]) => {
+        try {
+          const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`).then(r=>r.json());
+          return { label, value: formatBRL(+r.price) };
+        } catch {
+          return { label, value: "R$ --" };
+        }
+      })
+    );
+
+    marketData = [
+      { label: "USD", value: formatBRL(usd) },
+      { label: "GBP", value: formatBRL(gbp) },
+      ...crypto
+    ];
+
+  } catch {
+    marketData = [
+      { label: "USD", value: "R$ --" },
+      { label: "GBP", value: "R$ --" }
+    ];
+  }
 }
 
 /* SWAP */
@@ -237,7 +235,8 @@ function swapWeather(){
   const active = wToggle?A:B;
   const nextEl = wToggle?B:A;
 
-  nextEl.innerHTML = `<div class="label">${next.label}</div><div class="value">${next.value}</div>`;
+  nextEl.querySelector(".label").textContent = next.label;
+  nextEl.querySelector(".value").textContent = next.value;
 
   nextEl.classList.add("active");
   active.classList.remove("active");
@@ -257,7 +256,8 @@ function swapMarket(){
   const active = mToggle?A:B;
   const nextEl = mToggle?B:A;
 
-  nextEl.innerHTML = `<div class="label">${next.label}</div><div class="value">${next.value}</div>`;
+  nextEl.querySelector(".label").textContent = next.label;
+  nextEl.querySelector(".value").textContent = next.value;
 
   nextEl.classList.add("active");
   active.classList.remove("active");
@@ -267,6 +267,9 @@ function swapMarket(){
 
 /* INIT */
 async function init(){
+  document.querySelector("#wA .value").textContent = "Carregando...";
+  document.querySelector("#mA .value").textContent = "Carregando...";
+
   try { await retry(fetchWeather); } catch {}
   try { await retry(fetchMarket); } catch {}
 }
@@ -277,8 +280,9 @@ setInterval(fetchWeather, 900000);
 setInterval(fetchMarket, 15000);
 
 setInterval(swapWeather, 3000);
-setInterval(swapMarket, 2500);
+setInterval(swapMarket, 3000);
 </script>
 
 </body>
 </html>
+```
