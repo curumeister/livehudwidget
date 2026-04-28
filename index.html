@@ -6,54 +6,49 @@
 
 <style>
 * {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Segoe UI',sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Segoe UI', sans-serif;
 }
 
 body {
-  margin:0;
-  background:transparent;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:100vh;
+  margin: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
 }
 
 /* WIDGET */
 .widget {
-  width:300px;
-  padding:10px 14px;
-  border-radius:16px;
+  width: 300px;
+  padding: 10px 14px;
+  border-radius: 16px;
 
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  background: rgba(20,20,20,0.6);
+  background: rgba(20, 20, 20, 0.6);
   backdrop-filter: blur(10px);
 
-  position:relative;
-  overflow:hidden;
+  position: relative;
+  overflow: hidden;
 }
 
-/* BORDA */
+/* BORDA ANIMADA (laranja + roxo) */
 .widget::before {
-  content:"";
-  position:absolute;
-  inset:0;
-  border-radius:16px;
-  padding:1px;
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  padding: 3px;
 
-  background: linear-gradient(
-    135deg,
-    #ff7a00,
-    #ff3c3c,
-    #a855f7,
-    #3b82f6,
-    #ff7a00
-  );
+  background: linear-gradient(135deg, #ff7a00, #a855f7, #ff7a00);
+  background-size: 200% 200%;
+  animation: bordaAnimada 3s linear infinite;
 
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
@@ -62,55 +57,68 @@ body {
           mask-composite: exclude;
 }
 
+@keyframes bordaAnimada {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 /* COLUNAS */
 .col {
-  width:48%;
+  width: 48%;
 }
 
 /* STACK */
 .stack {
-  position:relative;
-  height:28px;
+  position: relative;
+  height: 28px;
 }
 
 /* ITEM */
 .item {
-  position:absolute;
-  inset:0;
+  position: absolute;
+  inset: 0;
 
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-  opacity:0;
-  transition: opacity 0.4s ease;
+  /* transição apenas de opacidade e escala (zero movimento vertical) */
+  transition: opacity 0.4s ease, transform 0.4s ease;
+
+  /* estado inativo: invisível e levemente encolhido */
+  opacity: 0;
+  transform: scale(0.9);
+  pointer-events: none;
 }
 
 .item.active {
-  opacity:1;
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
 }
 
 /* TEXTO */
 .label {
-  font-size:13px;
-  color:rgba(255,255,255,0.6);
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .value {
-  font-size:20px;
-  font-weight:700;
-  color:#fff;
-  white-space:nowrap;
+  font-size: 20px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
 }
 
 /* divisor */
 .divider {
-  width:1px;
-  height:24px;
-  background:rgba(255,255,255,0.1);
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
 }
 </style>
 </head>
@@ -152,28 +160,47 @@ body {
 </div>
 
 <script>
-const API_KEY = "46f49c9551bea5305c63071f37f9622d";
+const API_KEY = "46f49c9551bea5305c63071f37f9622d"; // OpenWeatherMap
 
-const formatBRL = n =>
-  n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+/* ============================
+   FORMATAÇÃO INTELIGENTE (K, M, B)
+   ============================ */
+const formatCurrencyCompact = (value) => {
+  if (isNaN(value) || value === null) return "R$ --";
 
-/* WEATHER */
+  const abs = Math.abs(value);
+  if (abs < 1000) {
+    return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  } else if (abs < 1000000) {
+    return `R$ ${(value / 1000).toFixed(1)}K`;
+  } else if (abs < 1000000000) {
+    return `R$ ${(value / 1000000).toFixed(1)}M`;
+  } else {
+    return `R$ ${(value / 1000000000).toFixed(1)}B`;
+  }
+};
+
+/* WEATHER – 8 CIDADES (nomes completos) */
 let weatherData = [];
 let wi = 0;
 let wToggle = true;
 
-async function fetchWeather(){
+async function fetchWeather() {
   const cities = [
     { id: 3448439 }, // São Paulo
-    { id: 3470127 }, // Rio
-    { id: 3451190 }, // BH
-    { id: 3450554 }  // Salvador
+    { id: 3452925 }, // Rio de Janeiro
+    { id: 3451190 }, // Belo Horizonte
+    { id: 3450554 }, // Salvador
+    { id: 3455775 }, // Palmas
+    { id: 3662574 }, // Rio Branco
+    { id: 3663517 }, // Manaus
+    { id: 3465038 }  // Cuiabá
   ];
 
   const res = await Promise.all(
     cities.map(c =>
       fetch(`https://api.openweathermap.org/data/2.5/weather?id=${c.id}&units=metric&appid=${API_KEY}`)
-        .then(r=>r.json())
+        .then(r => r.json())
     )
   );
 
@@ -183,91 +210,103 @@ async function fetchWeather(){
   }));
 }
 
-/* MARKET */
+/* MARKET – AwesomeAPI (USD, GBP, CNY) + Binance (ETH, MATIC) */
 let marketData = [];
 let mi = 0;
 let mToggle = true;
 
-async function fetchMarket(){
+async function fetchMarket() {
   try {
-    const fiat = await fetch("https://api.exchangerate.host/latest?base=BRL&symbols=USD,GBP")
-      .then(r=>r.json());
+    const [usdRes, gbpRes, cnyRes] = await Promise.all([
+      fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL"),
+      fetch("https://economia.awesomeapi.com.br/json/last/GBP-BRL"),
+      fetch("https://economia.awesomeapi.com.br/json/last/CNY-BRL")
+    ]);
 
-    const cryptoSymbols = {
-      ETH: "ETHBRL",
-      MATIC: "MATICBRL"
-    };
+    const usdJson = await usdRes.json();
+    const gbpJson = await gbpRes.json();
+    const cnyJson = await cnyRes.json();
 
-    const crypto = await Promise.all(
-      Object.entries(cryptoSymbols).map(async ([label, symbol]) => {
-        try {
-          const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`).then(r=>r.json());
-          return { label, value: formatBRL(+r.price) };
-        } catch {
-          return { label, value: "R$ --" };
-        }
-      })
-    );
+    const usdBid = parseFloat(usdJson.USDBRL.bid);
+    const gbpBid = parseFloat(gbpJson.GBPBRL.bid);
+    const cnyBid = parseFloat(cnyJson.CNYBRL.bid);
+
+    // Criptomoedas via Binance
+    let ethValue = null;
+    let maticValue = null;
+    try {
+      const ethRes = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHBRL");
+      const ethJson = await ethRes.json();
+      ethValue = parseFloat(ethJson.price);
+    } catch {}
+    try {
+      const maticRes = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=MATICBRL");
+      const maticJson = await maticRes.json();
+      maticValue = parseFloat(maticJson.price);
+    } catch {}
 
     marketData = [
-      { label: "USD", value: formatBRL(1 / fiat.rates.USD) },
-      { label: "GBP", value: formatBRL(1 / fiat.rates.GBP) },
-      ...crypto
+      { label: "USD", value: formatCurrencyCompact(usdBid) },
+      { label: "GBP", value: formatCurrencyCompact(gbpBid) },
+      { label: "CNY", value: formatCurrencyCompact(cnyBid) },
+      { label: "ETH", value: ethValue ? formatCurrencyCompact(ethValue) : "R$ --" },
+      { label: "MATIC", value: maticValue ? formatCurrencyCompact(maticValue) : "R$ --" }
     ];
-
   } catch {
     marketData = [
       { label: "USD", value: "R$ --" },
-      { label: "GBP", value: "R$ --" }
+      { label: "GBP", value: "R$ --" },
+      { label: "CNY", value: "R$ --" },
+      { label: "ETH", value: "R$ --" },
+      { label: "MATIC", value: "R$ --" }
     ];
   }
 }
 
-/* SWAP */
-function swapWeather(){
-  if(!weatherData.length) return;
+/* ============================
+   FUNÇÃO DE TROCA SUAVE (FADE + SCALE)
+   ============================ */
+function smoothSwap(elementA, elementB, nextData, toggle) {
+  const activeEl = toggle ? elementA : elementB;
+  const nextEl = toggle ? elementB : elementA;
 
-  wi = (wi+1)%weatherData.length;
-  const next = weatherData[wi];
+  // Preenche os dados no elemento que entrará
+  nextEl.querySelector(".label").textContent = nextData.label;
+  nextEl.querySelector(".value").textContent = nextData.value;
 
-  const A=document.getElementById("wA");
-  const B=document.getElementById("wB");
-
-  const active = wToggle?A:B;
-  const nextEl = wToggle?B:A;
-
-  nextEl.querySelector(".label").textContent = next.label;
-  nextEl.querySelector(".value").textContent = next.value;
-
+  // Aplica a transição: remove a classe active do atual e coloca no próximo
+  activeEl.classList.remove("active");
   nextEl.classList.add("active");
-  active.classList.remove("active");
-
-  wToggle=!wToggle;
 }
 
-function swapMarket(){
-  if(!marketData.length) return;
+/* SWAP WEATHER */
+function swapWeather() {
+  if (!weatherData.length) return;
 
-  mi = (mi+1)%marketData.length;
+  wi = (wi + 1) % weatherData.length;
+  const next = weatherData[wi];
+  const A = document.getElementById("wA");
+  const B = document.getElementById("wB");
+
+  smoothSwap(A, B, next, wToggle);
+  wToggle = !wToggle;
+}
+
+/* SWAP MARKET */
+function swapMarket() {
+  if (!marketData.length) return;
+
+  mi = (mi + 1) % marketData.length;
   const next = marketData[mi];
+  const A = document.getElementById("mA");
+  const B = document.getElementById("mB");
 
-  const A=document.getElementById("mA");
-  const B=document.getElementById("mB");
-
-  const active = mToggle?A:B;
-  const nextEl = mToggle?B:A;
-
-  nextEl.querySelector(".label").textContent = next.label;
-  nextEl.querySelector(".value").textContent = next.value;
-
-  nextEl.classList.add("active");
-  active.classList.remove("active");
-
-  mToggle=!mToggle;
+  smoothSwap(A, B, next, mToggle);
+  mToggle = !mToggle;
 }
 
 /* INIT */
-async function init(){
+async function init() {
   await fetchWeather();
   await fetchMarket();
 }
@@ -275,7 +314,7 @@ async function init(){
 init();
 
 setInterval(fetchWeather, 900000);
-setInterval(fetchMarket, 15000);
+setInterval(fetchMarket, 60000);
 setInterval(swapWeather, 3000);
 setInterval(swapMarket, 3000);
 </script>
