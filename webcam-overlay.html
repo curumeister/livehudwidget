@@ -21,80 +21,60 @@ body {
   overflow: hidden;
 }
 
-/* Container principal */
 .overlay {
   position: relative;
-  width: 640px;   /* 16:9 */
+  width: 640px;
   height: 360px;
-  border-radius: 20px;
+  border: 3px solid #ff7a00;
+  box-shadow: 0 0 12px rgba(255, 122, 0, 0.4);
 }
 
-/* Camada de fundo com leve transparência */
-.overlay::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  background: rgba(0,0,0,0.1);
-  backdrop-filter: blur(2px);
-  z-index: 1;
-}
-
-/* Borda externa animada */
-.overlay .border-animated {
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  padding: 4px;
-  background: linear-gradient(135deg, #ff7a00, #a855f7, #ff7a00);
-  background-size: 200% 200%;
-  animation: bordaAnimada 3s linear infinite;
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  z-index: 2;
-}
-
-@keyframes bordaAnimada {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Borda interna sutil (glow constante) */
+/* Glow interno sutil */
 .overlay .border-inner {
   position: absolute;
   top: 6px; left: 6px; right: 6px; bottom: 6px;
-  border-radius: 16px;
   box-shadow:
-    inset 0 0 15px 3px rgba(168,85,247,0.3),
-    inset 0 0 5px 1px rgba(255,122,0,0.2);
+    inset 0 0 12px rgba(255, 122, 0, 0.2),
+    inset 0 0 3px rgba(255, 122, 0, 0.1);
   z-index: 3;
   pointer-events: none;
 }
 
-/* Barra inferior com informações */
+/* Barra inferior única (centralizada) */
 .info-bar {
   position: absolute;
   bottom: 8px;
   left: 12px;
   right: 12px;
-  height: 32px;
+  height: 48px;
   z-index: 5;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   padding: 0 16px;
-  border-radius: 10px;
   background: rgba(20, 20, 20, 0.65);
-  backdrop-filter: blur(8px);
   box-shadow: 0 0 10px rgba(0,0,0,0.5);
   font-family: 'Orbitron', sans-serif;
-  font-size: 12px;
+  font-size: 20px;
   color: white;
   letter-spacing: 1px;
+}
+
+/* Cada mensagem ocupa o mesmo espaço, com transição */
+.info-bar .message {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  white-space: nowrap;
+}
+
+.info-bar .message.active {
+  opacity: 1;
 }
 
 /* Canal */
@@ -108,92 +88,104 @@ body {
   align-items: center;
 }
 
-/* "by" itálico */
 .info-bar .channel em {
   font-style: italic;
   font-weight: 400;
-  margin: 0 2px;
+  margin: 0 8px;
 }
 
-/* Gradiente estático para "curumeister" + brilho deslizante */
+/* "curumeister" com gradiente estático */
 .info-bar .channel-highlight {
   background: linear-gradient(135deg, #ff7a00, #a855f7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  position: relative;
-  overflow: hidden;
 }
 
-/* Brilho que passa por cima */
-.info-bar .channel-highlight::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255,255,255,0.4),
-    transparent
-  );
-  transform: skewX(-20deg);
-  animation: brilho 3s ease-in-out infinite;
-}
-
-@keyframes brilho {
-  0% { left: -100%; }
-  50% { left: 120%; }
-  100% { left: 120%; }
-}
-
-/* Cupom geral (branco) */
-.info-bar .coupon {
+/* Cupom */
+.info-bar .coupon-message {
   font-weight: 700;
   white-space: nowrap;
   color: white;
 }
 
-/* Cupom texto normal */
-.info-bar .coupon .coupon-text {
+.info-bar .coupon-message .coupon-text {
   color: white;
   -webkit-text-fill-color: white;
 }
 
-/* Destaque "CURU" verde com brilho pulsante */
-.info-bar .coupon .cupom-highlight {
+/* "CURU" em itálico e com brilho verde */
+.info-bar .coupon-message .cupom-highlight {
+  font-style: italic;   /* itálico */
   color: #BFFF00;
   -webkit-text-fill-color: #BFFF00;
+  text-shadow: 0 0 4px #BFFF00;
+  animation: pulsarVerde 2s ease-in-out infinite alternate;
+  will-change: text-shadow;
+}
+
+/* "TRADEIT.GG" em azul neon */
+.info-bar .coupon-message .tradeit-highlight {
+  color: #00BFFF;   /* azul neon */
+  -webkit-text-fill-color: #00BFFF;
   font-weight: 700;
-  animation: pulsarVerde 1.5s ease-in-out infinite alternate;
+  text-shadow: 0 0 4px #00BFFF;   /* brilho azul */
 }
 
 @keyframes pulsarVerde {
-  0% { text-shadow: 0 0 4px #BFFF00, 0 0 8px #BFFF00; }
-  100% { text-shadow: 0 0 12px #BFFF00, 0 0 20px #BFFF00, 0 0 28px #BFFF00; }
+  0% { text-shadow: 0 0 4px #BFFF00; }
+  100% { text-shadow: 0 0 12px #BFFF00, 0 0 20px #BFFF00; }
 }
 </style>
 </head>
 <body>
   <div class="overlay">
-    <!-- Borda animada -->
-    <div class="border-animated"></div>
     <!-- Glow interno -->
     <div class="border-inner"></div>
-    <!-- Barra inferior -->
+
+    <!-- Barra inferior única com duas mensagens -->
     <div class="info-bar">
-      <span class="channel">
-        opiordocs <em>by</em>
-        <span class="channel-highlight">curumeister</span>
-      </span>
-      <span class="coupon">
-        <span class="coupon-text">cupom:</span>
-        <span class="cupom-highlight">CURU</span>
-        <span class="coupon-text"> na tradeit.gg</span>
-      </span>
+      <!-- Mensagem 1: Canal -->
+      <div class="message active" id="channelMessage">
+        <span class="channel">
+          opiordocs <em>by</em> <span class="channel-highlight">curumeister</span>
+        </span>
+      </div>
+      <!-- Mensagem 2: Cupom -->
+      <div class="message" id="couponMessage">
+        <span class="coupon-message">
+          <span class="coupon-text">cupom: </span>
+          <span class="cupom-highlight">CURU</span>
+          <span class="coupon-text"> na </span>
+          <span class="tradeit-highlight">TRADEIT.GG</span>
+        </span>
+      </div>
     </div>
   </div>
+
+  <script>
+    const channelMsg = document.getElementById('channelMessage');
+    const couponMsg = document.getElementById('couponMessage');
+
+    const CUPOM_VISIBLE = 15000;   // 15 segundos mostrando cupom
+    const CHANNEL_VISIBLE = 45000; // 45 segundos mostrando canal
+
+    let cupomActive = false;
+
+    function showCupom() {
+      if (cupomActive) return;
+      cupomActive = true;
+      channelMsg.classList.remove('active');
+      couponMsg.classList.add('active');
+      setTimeout(() => {
+        couponMsg.classList.remove('active');
+        channelMsg.classList.add('active');
+        cupomActive = false;
+      }, CUPOM_VISIBLE);
+    }
+
+    // Inicia mostrando o canal; a cada 1 minuto alterna
+    setInterval(showCupom, CHANNEL_VISIBLE + CUPOM_VISIBLE);
+  </script>
 </body>
 </html>
