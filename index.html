@@ -23,8 +23,8 @@ body {
 
 /* WIDGET */
 .widget {
-  width: 300px;
-  padding: 10px 14px;
+  width: 320px;                /* um pouco mais largo (era 300px) */
+  padding: 12px 16px;          /* mais respiro */
   border-radius: 16px;
 
   display: flex;
@@ -38,40 +38,38 @@ body {
   overflow: hidden;
 }
 
-/* BORDA ANIMADA (laranja + roxo) */
+/* BORDA ANIMADA OTIMIZADA */
 .widget::before {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: 16px;
   padding: 3px;
-
   background: linear-gradient(135deg, #ff7a00, #a855f7, #ff7a00);
   background-size: 200% 200%;
-  animation: bordaAnimada 3s linear infinite;
-
+  animation: bordaAnimada 4s linear infinite;
   -webkit-mask:
     linear-gradient(#000 0 0) content-box,
     linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask-composite: exclude;
+  will-change: background-position;
 }
 
 @keyframes bordaAnimada {
   0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
 }
 
 /* COLUNAS */
 .col {
-  width: 48%;
+  width: 47%;                  /* ligeiramente menos para caber divisor */
 }
 
 /* STACK */
 .stack {
   position: relative;
-  height: 28px;
+  height: 32px;                /* um pouco maior para fonte maior */
 }
 
 /* ITEM */
@@ -83,12 +81,9 @@ body {
   justify-content: space-between;
   align-items: center;
 
-  /* transição apenas de opacidade e escala (zero movimento vertical) */
-  transition: opacity 0.4s ease, transform 0.4s ease;
-
-  /* estado inativo: invisível e levemente encolhido */
   opacity: 0;
   transform: scale(0.9);
+  transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none;
 }
 
@@ -98,15 +93,18 @@ body {
   pointer-events: auto;
 }
 
-/* TEXTO */
+/* TEXTO - LABEL (cidade / moeda) */
 .label {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;             /* era 13px → agora 15px */
+  font-weight: 600;            /* levemente mais encorpado */
+  color: rgba(255, 255, 255, 0.9);  /* 90% de opacidade (era 0.6) */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-width: 65%;             /* garante espaço para o valor */
 }
 
+/* VALUE (temperatura / cotação) */
 .value {
   font-size: 20px;
   font-weight: 700;
@@ -118,7 +116,7 @@ body {
 .divider {
   width: 1px;
   height: 24px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
 }
 </style>
 </head>
@@ -160,14 +158,11 @@ body {
 </div>
 
 <script>
-const API_KEY = "46f49c9551bea5305c63071f37f9622d"; // OpenWeatherMap
+const API_KEY = "46f49c9551bea5305c63071f37f9622d";
 
-/* ============================
-   FORMATAÇÃO INTELIGENTE (K, M, B)
-   ============================ */
+/* FORMATAÇÃO COMPACTA */
 const formatCurrencyCompact = (value) => {
   if (isNaN(value) || value === null) return "R$ --";
-
   const abs = Math.abs(value);
   if (abs < 1000) {
     return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -180,7 +175,7 @@ const formatCurrencyCompact = (value) => {
   }
 };
 
-/* WEATHER – 8 CIDADES (nomes completos) */
+/* CLIMA */
 let weatherData = [];
 let wi = 0;
 let wToggle = true;
@@ -210,7 +205,7 @@ async function fetchWeather() {
   }));
 }
 
-/* MARKET – AwesomeAPI (USD, GBP, CNY) + Binance (ETH, MATIC) */
+/* MERCADO */
 let marketData = [];
 let mi = 0;
 let mToggle = true;
@@ -231,9 +226,7 @@ async function fetchMarket() {
     const gbpBid = parseFloat(gbpJson.GBPBRL.bid);
     const cnyBid = parseFloat(cnyJson.CNYBRL.bid);
 
-    // Criptomoedas via Binance
-    let ethValue = null;
-    let maticValue = null;
+    let ethValue = null, maticValue = null;
     try {
       const ethRes = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=ETHBRL");
       const ethJson = await ethRes.json();
@@ -263,45 +256,41 @@ async function fetchMarket() {
   }
 }
 
-/* ============================
-   FUNÇÃO DE TROCA SUAVE (FADE + SCALE)
-   ============================ */
+/* TROCA SUAVE */
 function smoothSwap(elementA, elementB, nextData, toggle) {
   const activeEl = toggle ? elementA : elementB;
   const nextEl = toggle ? elementB : elementA;
 
-  // Preenche os dados no elemento que entrará
   nextEl.querySelector(".label").textContent = nextData.label;
   nextEl.querySelector(".value").textContent = nextData.value;
 
-  // Aplica a transição: remove a classe active do atual e coloca no próximo
-  activeEl.classList.remove("active");
-  nextEl.classList.add("active");
+  requestAnimationFrame(() => {
+    activeEl.classList.remove("active");
+    nextEl.classList.add("active");
+  });
 }
 
-/* SWAP WEATHER */
 function swapWeather() {
   if (!weatherData.length) return;
-
   wi = (wi + 1) % weatherData.length;
-  const next = weatherData[wi];
-  const A = document.getElementById("wA");
-  const B = document.getElementById("wB");
-
-  smoothSwap(A, B, next, wToggle);
+  smoothSwap(
+    document.getElementById("wA"),
+    document.getElementById("wB"),
+    weatherData[wi],
+    wToggle
+  );
   wToggle = !wToggle;
 }
 
-/* SWAP MARKET */
 function swapMarket() {
   if (!marketData.length) return;
-
   mi = (mi + 1) % marketData.length;
-  const next = marketData[mi];
-  const A = document.getElementById("mA");
-  const B = document.getElementById("mB");
-
-  smoothSwap(A, B, next, mToggle);
+  smoothSwap(
+    document.getElementById("mA"),
+    document.getElementById("mB"),
+    marketData[mi],
+    mToggle
+  );
   mToggle = !mToggle;
 }
 
