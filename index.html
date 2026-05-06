@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Widget Clima + Câmbio (USD, EUR, BTC)</title>
+<title>Widget Clima + Câmbio - 3 Cidades</title>
 <style>
 * {
   margin: 0;
@@ -56,16 +56,15 @@ body {
 .inner-flex {
   display: flex;
   width: 100%;
-  background: transparent;
+  background: rgba(20, 20, 30, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
   gap: 0;
 }
 
 .widget-clima {
   width: 340px;
   padding: 6px 12px;
-  background: rgba(20, 20, 30, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 0;
   flex-shrink: 0;
 }
 
@@ -182,45 +181,29 @@ body {
 <script>
 const API_KEY = "46f49c9551bea5305c63071f37f9622d";
 
-// ========== LISTA DE ITENS (CLIMA + CÂMBIO) ==========
-// Primeiro as cidades (clima)
+// ========== APENAS 3 CIDADES ==========
 const cities = [
-  { name: "São Paulo", country: "BR", type: "weather" },
-  { name: "Rio de Janeiro", country: "BR", type: "weather" },
   { name: "Belo Horizonte", country: "BR", type: "weather" },
-  { name: "Salvador", country: "BR", type: "weather" },
-  { name: "Palmas", country: "BR", type: "weather" },
-  { name: "Rio Branco", country: "BR", type: "weather" },
-  { name: "Manaus", country: "BR", type: "weather" },
-  { name: "Cuiabá", country: "BR", type: "weather" },
-  { name: "Roma", country: "IT", type: "weather" },
-  { name: "Barcelona", country: "ES", type: "weather" },
-  { name: "New York", country: "US", type: "weather" },
-  { name: "Tokyo", country: "JP", type: "weather" },
-  { name: "Hong Kong", country: "HK", type: "weather" },
-  { name: "Pequim", country: "CN", type: "weather" },
-  { name: "Copenhagen", country: "DK", type: "weather" },
-  { name: "Helsinki", country: "FI", type: "weather" }
+  { name: "São Paulo", country: "BR", type: "weather" },
+  { name: "Rio de Janeiro", country: "BR", type: "weather" }
 ];
 
-// Itens de câmbio (serão adicionados ao final da lista)
+// Itens de câmbio (USD, EUR, BTC)
 const exchangeItems = [
   { label: "USD", icon: "💵", type: "usd" },
   { label: "EUR", icon: "💶", type: "eur" },
   { label: "BTC", icon: "₿", type: "btc" }
 ];
 
-// ========== DADOS GLOBAIS ==========
-let displayItems = []; // array final: cada item tem { icon, value, label, type }
+let displayItems = []; // array final: [clima1, clima2, clima3, usd, eur, btc]
 let currentIndex = 0;
 let animating = false;
 let activeIsA = true;
 let cycleTimeout = null;
 
-const DISPLAY_DURATION = 4650;   // ms que cada item fica visível
+const DISPLAY_DURATION = 4650;   // ms por item
 const ANIMATION_DURATION = 350;
 
-// ---------- Formatação de moeda ----------
 function formatCurrency(value) {
   if (isNaN(value) || value === null) return "R$ --";
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -231,7 +214,7 @@ function formatBTC(value) {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
 }
 
-// ---------- Funções de busca de dados ----------
+// Busca clima de uma cidade
 async function fetchWeatherForCity(city) {
   const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.name},${city.country}&units=metric&appid=${API_KEY}`;
   const res = await fetch(url);
@@ -246,39 +229,33 @@ async function fetchWeatherForCity(city) {
   };
 }
 
+// Buscas de câmbio
 async function fetchUSD() {
   const res = await fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL");
   const json = await res.json();
-  const bid = parseFloat(json.USDBRL.bid);
-  return { value: formatCurrency(bid) };
+  return { value: formatCurrency(parseFloat(json.USDBRL.bid)) };
 }
-
 async function fetchEUR() {
   const res = await fetch("https://economia.awesomeapi.com.br/json/last/EUR-BRL");
   const json = await res.json();
-  const bid = parseFloat(json.EURBRL.bid);
-  return { value: formatCurrency(bid) };
+  return { value: formatCurrency(parseFloat(json.EURBRL.bid)) };
 }
-
 async function fetchBTC() {
-  // Usando Binance API para BTC/BRL
   const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCBRL");
   const json = await res.json();
-  const price = parseFloat(json.price);
-  return { value: formatBTC(price) };
+  return { value: formatBTC(parseFloat(json.price)) };
 }
 
-// Atualiza todos os itens de câmbio no array displayItems
+// Atualiza os valores de câmbio no array displayItems
 async function updateExchangeRates() {
   try {
     const [usdData, eurData, btcData] = await Promise.all([fetchUSD(), fetchEUR(), fetchBTC()]);
-    // Atualiza os itens no displayItems (índices após as cidades)
-    const startIdx = cities.length;
+    const startIdx = cities.length; // índice onde começam os câmbios (3)
     if (displayItems[startIdx]) displayItems[startIdx].value = usdData.value;
     if (displayItems[startIdx + 1]) displayItems[startIdx + 1].value = eurData.value;
     if (displayItems[startIdx + 2]) displayItems[startIdx + 2].value = btcData.value;
 
-    // Se o item atualmente visível for um dos câmbios, atualiza o DOM imediatamente
+    // Se o item atualmente visível for câmbio, atualiza o DOM
     const activeElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
     if (displayItems[currentIndex] && (displayItems[currentIndex].type === "usd" || displayItems[currentIndex].type === "eur" || displayItems[currentIndex].type === "btc")) {
       activeElem.querySelector(".value").textContent = displayItems[currentIndex].value;
@@ -288,22 +265,20 @@ async function updateExchangeRates() {
   }
 }
 
-// Obtém todos os dados climáticos e constrói o array displayItems
+// Busca todos os climas das 3 cidades e monta displayItems
 async function fetchAllWeather() {
   try {
     const weatherPromises = cities.map(c => fetchWeatherForCity(c));
     const weatherResults = await Promise.all(weatherPromises);
-    // Inicializa displayItems com os climas
     displayItems = [...weatherResults];
-    // Adiciona os itens de câmbio (valores serão preenchidos pelo updateExchangeRates)
+    // Adiciona itens de câmbio com valores placeholder
     displayItems.push({ icon: "💵", value: "R$ --", label: "USD", type: "usd" });
     displayItems.push({ icon: "💶", value: "R$ --", label: "EUR", type: "eur" });
     displayItems.push({ icon: "₿", value: "R$ --", label: "BTC", type: "btc" });
-    // Busca câmbios pela primeira vez
-    await updateExchangeRates();
+    await updateExchangeRates(); // preenche os valores reais
   } catch (err) {
     console.error("Falha ao buscar climas:", err);
-    // Fallback: cria itens com erro
+    // Fallback
     displayItems = cities.map(c => ({ icon: "🌡️", value: "--°C", label: c.name, type: "weather" }));
     displayItems.push({ icon: "💵", value: "R$ --", label: "USD", type: "usd" });
     displayItems.push({ icon: "💶", value: "R$ --", label: "EUR", type: "eur" });
@@ -311,7 +286,6 @@ async function fetchAllWeather() {
   }
 }
 
-// Função auxiliar para emoji de clima
 function getWeatherEmoji(iconCode) {
   const mapping = {
     "01d": "☀️", "01n": "🌙", "02d": "⛅", "02n": "☁️",
@@ -323,7 +297,7 @@ function getWeatherEmoji(iconCode) {
   return mapping[iconCode] || "🌡️";
 }
 
-// ========== LÓGICA DE TRANSIÇÃO (SEM GAP) ==========
+// Troca para o próximo item (sem gap)
 function swapToNextItem() {
   if (animating || displayItems.length === 0) return;
 
@@ -332,95 +306,69 @@ function swapToNextItem() {
   const currentElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
   const nextElem = activeIsA ? document.getElementById("weatherB") : document.getElementById("weatherA");
 
-  // Preenche próximo elemento
   nextElem.querySelector(".icon").textContent = nextData.icon;
   nextElem.querySelector(".value").textContent = nextData.value;
   nextElem.querySelector(".label").textContent = nextData.label;
 
-  // Limpa classes
   nextElem.classList.remove("active", "exit-down", "enter-up");
   currentElem.classList.remove("enter-up");
-
-  void nextElem.offsetHeight; // reflow
-
+  void nextElem.offsetHeight;
   currentElem.classList.add("exit-down");
   currentElem.classList.remove("active");
-
   nextElem.classList.add("enter-up");
   void nextElem.offsetHeight;
-
   nextElem.classList.add("active");
   nextElem.classList.remove("enter-up");
 
   animating = true;
 
   const onFinish = () => {
-    currentElem.classList.remove("exit-down");
-    currentElem.classList.remove("active");
+    currentElem.classList.remove("exit-down", "active");
     nextElem.classList.remove("enter-up");
     activeIsA = !activeIsA;
     currentIndex = nextIndex;
     animating = false;
-
     if (cycleTimeout) clearTimeout(cycleTimeout);
-    cycleTimeout = setTimeout(() => {
-      swapToNextItem();
-    }, DISPLAY_DURATION);
-
+    cycleTimeout = setTimeout(() => swapToNextItem(), DISPLAY_DURATION);
     currentElem.removeEventListener("transitionend", onFinish);
   };
-
   currentElem.addEventListener("transitionend", onFinish, { once: true });
-  setTimeout(() => {
-    if (animating) onFinish();
-  }, ANIMATION_DURATION + 50);
+  setTimeout(() => { if (animating) onFinish(); }, ANIMATION_DURATION + 50);
 }
 
-// ========== INICIALIZAÇÃO ==========
+// Inicialização
 async function init() {
-  await fetchAllWeather(); // carrega clima e câmbios iniciais
-  // Atualiza o primeiro elemento visível
+  await fetchAllWeather();
   const firstElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
   if (displayItems[0]) {
     firstElem.querySelector(".icon").textContent = displayItems[0].icon;
     firstElem.querySelector(".value").textContent = displayItems[0].value;
     firstElem.querySelector(".label").textContent = displayItems[0].label;
   }
-  // Inicia ciclo
-  cycleTimeout = setTimeout(() => {
-    swapToNextItem();
-  }, DISPLAY_DURATION);
+  cycleTimeout = setTimeout(() => swapToNextItem(), DISPLAY_DURATION);
 }
 
-// Atualiza clima a cada 15 minutos, mas preserva a exibição atual
+// Atualiza clima a cada 15 min (apenas para as 3 cidades)
 setInterval(async () => {
   try {
-    const weatherPromises = cities.map(c => fetchWeatherForCity(c));
-    const newWeather = await Promise.all(weatherPromises);
-    // Atualiza apenas os itens de clima no displayItems (0 até cities.length-1)
+    const newWeather = await Promise.all(cities.map(c => fetchWeatherForCity(c)));
     for (let i = 0; i < cities.length; i++) {
       if (displayItems[i]) {
         displayItems[i].icon = newWeather[i].icon;
         displayItems[i].value = newWeather[i].value;
-        displayItems[i].label = newWeather[i].label;
       }
     }
-    // Se o item atual for clima, atualiza o DOM
     const activeElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
     if (displayItems[currentIndex] && displayItems[currentIndex].type === "weather") {
       activeElem.querySelector(".icon").textContent = displayItems[currentIndex].icon;
       activeElem.querySelector(".value").textContent = displayItems[currentIndex].value;
       activeElem.querySelector(".label").textContent = displayItems[currentIndex].label;
     }
-  } catch (err) {
-    console.error("Erro na atualização periódica do clima:", err);
-  }
+  } catch (err) { console.error("Erro atualização clima:", err); }
 }, 15 * 60 * 1000);
 
 // Atualiza câmbio a cada 30 segundos
-setInterval(() => {
-  updateExchangeRates();
-}, 30000);
+setInterval(() => updateExchangeRates(), 30000);
 
 init();
 </script>
