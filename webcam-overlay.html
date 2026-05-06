@@ -1,191 +1,263 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Webcam Overlay</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet">
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  background: transparent !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-  overflow: hidden;
-}
-
-.overlay {
-  position: relative;
-  width: 640px;
-  height: 360px;
-  border: 3px solid #ff7a00;
-  box-shadow: 0 0 12px rgba(255, 122, 0, 0.4);
-}
-
-/* Glow interno sutil */
-.overlay .border-inner {
-  position: absolute;
-  top: 6px; left: 6px; right: 6px; bottom: 6px;
-  box-shadow:
-    inset 0 0 12px rgba(255, 122, 0, 0.2),
-    inset 0 0 3px rgba(255, 122, 0, 0.1);
-  z-index: 3;
-  pointer-events: none;
-}
-
-/* Barra inferior única (centralizada) */
-.info-bar {
-  position: absolute;
-  bottom: 8px;
-  left: 12px;
-  right: 12px;
-  height: 48px;
-  z-index: 5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 16px;
-  background: rgba(20, 20, 20, 0.65);
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
-  font-family: 'Orbitron', sans-serif;
-  font-size: 20px;
-  color: white;
-  letter-spacing: 1px;
-}
-
-/* Cada mensagem ocupa o mesmo espaço, com transição */
-.info-bar .message {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 16px;
-  opacity: 0;
-  transition: opacity 0.5s ease;
-  white-space: nowrap;
-}
-
-.info-bar .message.active {
-  opacity: 1;
-}
-
-/* Canal */
-.info-bar .channel {
-  font-weight: 600;
-  color: rgba(255,255,255,0.9);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: flex;
-  align-items: center;
-}
-
-.info-bar .channel em {
-  font-style: italic;
-  font-weight: 400;
-  margin: 0 8px;
-}
-
-/* "curumeister" com gradiente estático */
-.info-bar .channel-highlight {
-  background: linear-gradient(135deg, #ff7a00, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Cupom */
-.info-bar .coupon-message {
-  font-weight: 700;
-  white-space: nowrap;
-  color: white;
-}
-
-.info-bar .coupon-message .coupon-text {
-  color: white;
-  -webkit-text-fill-color: white;
-}
-
-/* "CURU" em itálico e com brilho verde */
-.info-bar .coupon-message .cupom-highlight {
-  font-style: italic;   /* itálico */
-  color: #BFFF00;
-  -webkit-text-fill-color: #BFFF00;
-  text-shadow: 0 0 4px #BFFF00;
-  animation: pulsarVerde 2s ease-in-out infinite alternate;
-  will-change: text-shadow;
-}
-
-/* "TRADEIT.GG" em azul neon */
-.info-bar .coupon-message .tradeit-highlight {
-  color: #00BFFF;   /* azul neon */
-  -webkit-text-fill-color: #00BFFF;
-  font-weight: 700;
-  text-shadow: 0 0 4px #00BFFF;   /* brilho azul */
-}
-
-@keyframes pulsarVerde {
-  0% { text-shadow: 0 0 4px #BFFF00; }
-  100% { text-shadow: 0 0 12px #BFFF00, 0 0 20px #BFFF00; }
-}
-</style>
-</head>
-<body>
-  <div class="overlay">
-    <!-- Glow interno -->
-    <div class="border-inner"></div>
-
-    <!-- Barra inferior única com duas mensagens -->
-    <div class="info-bar">
-      <!-- Mensagem 1: Canal -->
-      <div class="message active" id="channelMessage">
-        <span class="channel">
-          opiordocs <em>by</em> <span class="channel-highlight">curumeister</span>
-        </span>
-      </div>
-      <!-- Mensagem 2: Cupom -->
-      <div class="message" id="couponMessage">
-        <span class="coupon-message">
-          <span class="coupon-text">cupom: </span>
-          <span class="cupom-highlight">CURU</span>
-          <span class="coupon-text"> na </span>
-          <span class="tradeit-highlight">TRADEIT.GG</span>
-        </span>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const channelMsg = document.getElementById('channelMessage');
-    const couponMsg = document.getElementById('couponMessage');
-
-    const CUPOM_VISIBLE = 15000;   // 15 segundos mostrando cupom
-    const CHANNEL_VISIBLE = 45000; // 45 segundos mostrando canal
-
-    let cupomActive = false;
-
-    function showCupom() {
-      if (cupomActive) return;
-      cupomActive = true;
-      channelMsg.classList.remove('active');
-      couponMsg.classList.add('active');
-      setTimeout(() => {
-        couponMsg.classList.remove('active');
-        channelMsg.classList.add('active');
-        cupomActive = false;
-      }, CUPOM_VISIBLE);
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Webcam Overlay - 3 Mensagens (Canal, Cupom, Links)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
     }
 
-    // Inicia mostrando o canal; a cada 1 minuto alterna
-    setInterval(showCupom, CHANNEL_VISIBLE + CUPOM_VISIBLE);
-  </script>
+    body {
+      background: transparent !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: 'Orbitron', monospace;
+    }
+
+    .overlay {
+      position: relative;
+      width: 640px;
+      height: 360px;
+      border: 3px solid #ff7a00;
+      box-shadow: 0 0 16px rgba(255, 122, 0, 0.6), inset 0 0 8px rgba(255, 122, 0, 0.2);
+      background: transparent;
+    }
+
+    .overlay .border-inner {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      right: 6px;
+      bottom: 6px;
+      box-shadow: inset 0 0 14px rgba(255, 122, 0, 0.25), inset 0 0 4px rgba(255, 122, 0, 0.4);
+      pointer-events: none;
+      z-index: 3;
+    }
+
+    /* BARRA SUPERIOR - FINA E TRANSPARENTE */
+    .info-bar {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      height: 32px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(8, 8, 12, 0.25);
+      backdrop-filter: blur(3px);
+      border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 122, 0, 0.3);
+      font-family: 'Orbitron', monospace;
+      font-weight: 500;
+      letter-spacing: 0.4px;
+      overflow: hidden;
+    }
+
+    .info-bar .message {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .info-bar .message.active {
+      opacity: 1;
+    }
+
+    /* Canal */
+    .info-bar .channel {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.95);
+      font-size: 0.95rem;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .channel-highlight {
+      background: linear-gradient(135deg, #ff9a2e, #c45eff, #ff7a00);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 800;
+      text-shadow: 0 0 4px rgba(255, 100, 0, 0.4);
+    }
+
+    .channel em {
+      font-style: italic;
+      font-weight: 500;
+      color: #dddddd;
+      margin: 0 2px;
+    }
+
+    /* Cupom */
+    .coupon-message {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: baseline;
+      gap: 3px;
+      white-space: nowrap;
+    }
+
+    .coupon-text {
+      color: #f0f0f0;
+      font-weight: 500;
+    }
+
+    .cupom-highlight {
+      font-style: italic;
+      font-weight: 900;
+      color: #bfff00;
+      -webkit-text-fill-color: #bfff00;
+      text-shadow: 0 0 6px #bfff00;
+      animation: pulsarVerde 2s ease-in-out infinite alternate;
+    }
+
+    .tradeit-highlight {
+      font-weight: 800;
+      color: #00c8ff;
+      -webkit-text-fill-color: #00c8ff;
+      text-shadow: 0 0 4px #00a6ff;
+    }
+
+    /* Links na bio - estilo */
+    .links-message {
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #ff66cc, #ff44aa);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 8px rgba(255, 68, 170, 0.6);
+      letter-spacing: 1px;
+    }
+
+    .links-message::before {
+      content: "🔗";
+      font-size: 1rem;
+      background: none;
+      -webkit-text-fill-color: initial;
+      color: #ff88cc;
+      text-shadow: 0 0 4px #ff66cc;
+      margin-right: 4px;
+    }
+
+    @keyframes pulsarVerde {
+      0% { text-shadow: 0 0 2px #bfff00; }
+      100% { text-shadow: 0 0 10px #eaff00, 0 0 14px #caff00; }
+    }
+
+    @media (max-width: 580px) {
+      .info-bar .channel,
+      .coupon-message,
+      .links-message {
+        font-size: 0.8rem;
+      }
+      .info-bar {
+        height: 30px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="overlay">
+  <div class="border-inner"></div>
+  <div class="info-bar">
+    <!-- Mensagem 1: Canal -->
+    <div class="message active" id="channelMessage">
+      <span class="channel">
+        opiordocs <em>by</em> <span class="channel-highlight">curumeister</span>
+      </span>
+    </div>
+    <!-- Mensagem 2: Cupom -->
+    <div class="message" id="couponMessage">
+      <span class="coupon-message">
+        <span class="coupon-text">cupom:</span>
+        <span class="cupom-highlight">CURU</span>
+        <span class="coupon-text">na</span>
+        <span class="tradeit-highlight">TRADEIT.GG</span>
+      </span>
+    </div>
+    <!-- Mensagem 3: Links na bio -->
+    <div class="message" id="linksMessage">
+      <span class="links-message">links na bio</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const channelDiv = document.getElementById('channelMessage');
+    const couponDiv = document.getElementById('couponMessage');
+    const linksDiv = document.getElementById('linksMessage');
+    
+    // Definição das durações (em milissegundos)
+    const DURATIONS = {
+      channel: 45000,   // 45 segundos
+      coupon: 15000,    // 15 segundos
+      links: 8000       // 8 segundos (lembrete rápido)
+    };
+
+    // Ordem do ciclo
+    const order = ['channel', 'coupon', 'links'];
+    let currentIndex = 0;
+    let timeoutId = null;
+
+    function setActiveMessage(type) {
+      // Remove active de todos
+      channelDiv.classList.remove('active');
+      couponDiv.classList.remove('active');
+      linksDiv.classList.remove('active');
+      // Ativa o solicitado
+      if (type === 'channel') channelDiv.classList.add('active');
+      else if (type === 'coupon') couponDiv.classList.add('active');
+      else if (type === 'links') linksDiv.classList.add('active');
+    }
+
+    function nextMessage() {
+      const currentType = order[currentIndex];
+      setActiveMessage(currentType);
+      
+      // Duração atual
+      let duration = DURATIONS[currentType];
+      
+      // Avança o índice para o próximo ciclo
+      currentIndex = (currentIndex + 1) % order.length;
+      
+      // Agenda a próxima troca
+      timeoutId = setTimeout(() => {
+        nextMessage();
+      }, duration);
+    }
+
+    // Inicia o ciclo (começa com a primeira mensagem: channel)
+    if (timeoutId) clearTimeout(timeoutId);
+    nextMessage();
+  })();
+</script>
 </body>
 </html>
