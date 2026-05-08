@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - 3 Mensagens (Canal, Cupom, Links)</title>
+  <title>Webcam Overlay - Glitch Effect (Canal + Cupom)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -27,8 +27,8 @@
       position: relative;
       width: 640px;
       height: 360px;
-      border: 3px solid #ff7a00;
-      box-shadow: 0 0 16px rgba(255, 122, 0, 0.6), inset 0 0 8px rgba(255, 122, 0, 0.2);
+      border: 3px solid #00ffff;
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 12px rgba(0, 255, 255, 0.3);
       background: transparent;
     }
 
@@ -38,29 +38,29 @@
       left: 6px;
       right: 6px;
       bottom: 6px;
-      box-shadow: inset 0 0 14px rgba(255, 122, 0, 0.25), inset 0 0 4px rgba(255, 122, 0, 0.4);
+      box-shadow: inset 0 0 18px rgba(0, 255, 255, 0.3), inset 0 0 6px rgba(0, 255, 255, 0.5);
       pointer-events: none;
       z-index: 3;
     }
 
-    /* BARRA SUPERIOR - FINA E TRANSPARENTE */
+    /* BARRA INFERIOR - MAIOR E TRANSPARENTE */
     .info-bar {
       position: absolute;
-      top: 12px;
+      bottom: 12px;
       left: 12px;
       right: 12px;
-      height: 32px;
+      height: 48px;
       z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(8, 8, 12, 0.25);
-      backdrop-filter: blur(3px);
-      border-radius: 6px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 122, 0, 0.3);
+      background: rgba(8, 8, 12, 0.3);
+      backdrop-filter: blur(4px);
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 255, 255, 0.5);
       font-family: 'Orbitron', monospace;
-      font-weight: 500;
-      letter-spacing: 0.4px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
       overflow: hidden;
     }
 
@@ -70,9 +70,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0 16px;
+      padding: 0 20px;
       opacity: 0;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.05s linear;
       pointer-events: none;
       white-space: nowrap;
       overflow: hidden;
@@ -83,24 +83,59 @@
       opacity: 1;
     }
 
+    /* Efeito glitch */
+    .glitch {
+      animation: glitch-animation 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    }
+
+    @keyframes glitch-animation {
+      0% {
+        transform: translate(0);
+        text-shadow: -2px 0 #ff00c1, 2px 0 #00ffff;
+        opacity: 1;
+      }
+      20% {
+        transform: translate(-2px, 1px);
+        text-shadow: -2px 0 #ff00c1, 2px 0 #00ffff;
+      }
+      40% {
+        transform: translate(2px, -1px);
+        text-shadow: 2px 0 #ff00c1, -2px 0 #00ffff;
+        opacity: 0.9;
+      }
+      60% {
+        transform: translate(-1px, 2px);
+        text-shadow: -1px 0 #ff00c1, 1px 0 #00ffff;
+      }
+      80% {
+        transform: translate(1px, -2px);
+        text-shadow: 1px 0 #ff00c1, -1px 0 #00ffff;
+      }
+      100% {
+        transform: translate(0);
+        text-shadow: none;
+        opacity: 1;
+      }
+    }
+
     /* Canal */
     .info-bar .channel {
-      font-weight: 600;
+      font-weight: 700;
       color: rgba(255, 255, 255, 0.95);
-      font-size: 0.95rem;
+      font-size: 1.2rem;
       display: flex;
       align-items: baseline;
-      gap: 4px;
+      gap: 6px;
     }
 
     .channel-highlight {
-      background: linear-gradient(135deg, #ff9a2e, #c45eff, #ff7a00);
+      background: linear-gradient(135deg, #00ffff, #0088ff, #00ffff);
       background-size: 200% auto;
       -webkit-background-clip: text;
       background-clip: text;
       -webkit-text-fill-color: transparent;
-      font-weight: 800;
-      text-shadow: 0 0 4px rgba(255, 100, 0, 0.4);
+      font-weight: 900;
+      text-shadow: 0 0 6px rgba(0, 255, 255, 0.6);
     }
 
     .channel em {
@@ -113,10 +148,10 @@
     /* Cupom */
     .coupon-message {
       font-weight: 700;
-      font-size: 0.95rem;
+      font-size: 1.2rem;
       display: flex;
       align-items: baseline;
-      gap: 3px;
+      gap: 5px;
       white-space: nowrap;
     }
 
@@ -130,7 +165,7 @@
       font-weight: 900;
       color: #bfff00;
       -webkit-text-fill-color: #bfff00;
-      text-shadow: 0 0 6px #bfff00;
+      text-shadow: 0 0 8px #bfff00;
       animation: pulsarVerde 2s ease-in-out infinite alternate;
     }
 
@@ -138,47 +173,21 @@
       font-weight: 800;
       color: #00c8ff;
       -webkit-text-fill-color: #00c8ff;
-      text-shadow: 0 0 4px #00a6ff;
-    }
-
-    /* Links na bio - estilo */
-    .links-message {
-      font-weight: 700;
-      font-size: 0.95rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: linear-gradient(135deg, #ff66cc, #ff44aa);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 8px rgba(255, 68, 170, 0.6);
-      letter-spacing: 1px;
-    }
-
-    .links-message::before {
-      content: "🔗";
-      font-size: 1rem;
-      background: none;
-      -webkit-text-fill-color: initial;
-      color: #ff88cc;
-      text-shadow: 0 0 4px #ff66cc;
-      margin-right: 4px;
+      text-shadow: 0 0 6px #00a6ff;
     }
 
     @keyframes pulsarVerde {
-      0% { text-shadow: 0 0 2px #bfff00; }
-      100% { text-shadow: 0 0 10px #eaff00, 0 0 14px #caff00; }
+      0% { text-shadow: 0 0 4px #bfff00; }
+      100% { text-shadow: 0 0 14px #eaff00, 0 0 18px #caff00; }
     }
 
     @media (max-width: 580px) {
       .info-bar .channel,
-      .coupon-message,
-      .links-message {
-        font-size: 0.8rem;
+      .coupon-message {
+        font-size: 1rem;
       }
       .info-bar {
-        height: 30px;
+        height: 42px;
       }
     }
   </style>
@@ -202,10 +211,6 @@
         <span class="tradeit-highlight">TRADEIT.GG</span>
       </span>
     </div>
-    <!-- Mensagem 3: Links na bio -->
-    <div class="message" id="linksMessage">
-      <span class="links-message">links na bio</span>
-    </div>
   </div>
 </div>
 
@@ -213,48 +218,53 @@
   (function() {
     const channelDiv = document.getElementById('channelMessage');
     const couponDiv = document.getElementById('couponMessage');
-    const linksDiv = document.getElementById('linksMessage');
     
-    // Definição das durações (em milissegundos)
     const DURATIONS = {
       channel: 45000,   // 45 segundos
-      coupon: 15000,    // 15 segundos
-      links: 8000       // 8 segundos (lembrete rápido)
+      coupon: 15000     // 15 segundos
     };
 
-    // Ordem do ciclo
-    const order = ['channel', 'coupon', 'links'];
+    const order = ['channel', 'coupon'];
     let currentIndex = 0;
     let timeoutId = null;
 
+    function applyGlitch(element) {
+      if (!element) return;
+      element.classList.add('glitch');
+      setTimeout(() => {
+        element.classList.remove('glitch');
+      }, 300);
+    }
+
     function setActiveMessage(type) {
-      // Remove active de todos
+      const previousActive = document.querySelector('.info-bar .message.active');
+      if (previousActive) {
+        applyGlitch(previousActive);
+      }
+      
       channelDiv.classList.remove('active');
       couponDiv.classList.remove('active');
-      linksDiv.classList.remove('active');
-      // Ativa o solicitado
-      if (type === 'channel') channelDiv.classList.add('active');
-      else if (type === 'coupon') couponDiv.classList.add('active');
-      else if (type === 'links') linksDiv.classList.add('active');
+      
+      let newActive = null;
+      if (type === 'channel') newActive = channelDiv;
+      else if (type === 'coupon') newActive = couponDiv;
+      
+      if (newActive) {
+        newActive.classList.add('active');
+        applyGlitch(newActive);
+      }
     }
 
     function nextMessage() {
       const currentType = order[currentIndex];
       setActiveMessage(currentType);
-      
-      // Duração atual
       let duration = DURATIONS[currentType];
-      
-      // Avança o índice para o próximo ciclo
       currentIndex = (currentIndex + 1) % order.length;
-      
-      // Agenda a próxima troca
       timeoutId = setTimeout(() => {
         nextMessage();
       }, duration);
     }
 
-    // Inicia o ciclo (começa com a primeira mensagem: channel)
     if (timeoutId) clearTimeout(timeoutId);
     nextMessage();
   })();
