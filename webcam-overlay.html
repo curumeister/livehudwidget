@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Glitch Effect (Canal + Cupom)</title>
+  <title>Webcam Overlay - Glitch Suave (Canal + Cupom)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -43,7 +43,6 @@
       z-index: 3;
     }
 
-    /* BARRA INFERIOR - MAIOR E TRANSPARENTE */
     .info-bar {
       position: absolute;
       bottom: 12px;
@@ -72,7 +71,7 @@
       justify-content: center;
       padding: 0 20px;
       opacity: 0;
-      transition: opacity 0.05s linear;
+      transition: opacity 0.2s ease-in-out;
       pointer-events: none;
       white-space: nowrap;
       overflow: hidden;
@@ -83,38 +82,34 @@
       opacity: 1;
     }
 
-    /* Efeito glitch */
-    .glitch {
-      animation: glitch-animation 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+    /* Glitch apenas na saída */
+    .glitch-out {
+      animation: glitch-out 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
     }
 
-    @keyframes glitch-animation {
+    @keyframes glitch-out {
       0% {
         transform: translate(0);
-        text-shadow: -2px 0 #ff00c1, 2px 0 #00ffff;
+        text-shadow: -1px 0 #ff00c1, 1px 0 #00ffff;
         opacity: 1;
       }
-      20% {
-        transform: translate(-2px, 1px);
-        text-shadow: -2px 0 #ff00c1, 2px 0 #00ffff;
-      }
-      40% {
-        transform: translate(2px, -1px);
-        text-shadow: 2px 0 #ff00c1, -2px 0 #00ffff;
-        opacity: 0.9;
-      }
-      60% {
-        transform: translate(-1px, 2px);
+      25% {
+        transform: translate(-1px, 0.5px);
         text-shadow: -1px 0 #ff00c1, 1px 0 #00ffff;
       }
-      80% {
-        transform: translate(1px, -2px);
+      50% {
+        transform: translate(1px, -0.5px);
         text-shadow: 1px 0 #ff00c1, -1px 0 #00ffff;
+        opacity: 0.9;
+      }
+      75% {
+        transform: translate(-0.5px, 1px);
+        text-shadow: -0.5px 0 #ff00c1, 0.5px 0 #00ffff;
       }
       100% {
         transform: translate(0);
         text-shadow: none;
-        opacity: 1;
+        opacity: 0;
       }
     }
 
@@ -145,7 +140,7 @@
       margin: 0 2px;
     }
 
-    /* Cupom */
+    /* Cupom - textos normais em branco */
     .coupon-message {
       font-weight: 700;
       font-size: 1.2rem;
@@ -196,13 +191,9 @@
 <div class="overlay">
   <div class="border-inner"></div>
   <div class="info-bar">
-    <!-- Mensagem 1: Canal -->
     <div class="message active" id="channelMessage">
-      <span class="channel">
-        opiordocs <em>by</em> <span class="channel-highlight">curumeister</span>
-      </span>
+      <span class="channel">opiordocs <em>by</em> <span class="channel-highlight">curumeister</span></span>
     </div>
-    <!-- Mensagem 2: Cupom -->
     <div class="message" id="couponMessage">
       <span class="coupon-message">
         <span class="coupon-text">cupom:</span>
@@ -220,49 +211,49 @@
     const couponDiv = document.getElementById('couponMessage');
     
     const DURATIONS = {
-      channel: 45000,   // 45 segundos
-      coupon: 15000     // 15 segundos
+      channel: 45000,
+      coupon: 15000
     };
 
     const order = ['channel', 'coupon'];
     let currentIndex = 0;
     let timeoutId = null;
+    let isAnimating = false;
 
-    function applyGlitch(element) {
+    function applyGlitchOut(element, callback) {
       if (!element) return;
-      element.classList.add('glitch');
+      element.classList.add('glitch-out');
       setTimeout(() => {
-        element.classList.remove('glitch');
-      }, 300);
+        element.classList.remove('glitch-out');
+        if (callback) callback();
+      }, 200);
     }
 
     function setActiveMessage(type) {
       const previousActive = document.querySelector('.info-bar .message.active');
-      if (previousActive) {
-        applyGlitch(previousActive);
-      }
+      const newActive = type === 'channel' ? channelDiv : couponDiv;
       
-      channelDiv.classList.remove('active');
-      couponDiv.classList.remove('active');
+      if (!newActive) return;
+      if (isAnimating) return;
       
-      let newActive = null;
-      if (type === 'channel') newActive = channelDiv;
-      else if (type === 'coupon') newActive = couponDiv;
-      
-      if (newActive) {
+      if (previousActive && previousActive !== newActive) {
+        isAnimating = true;
+        applyGlitchOut(previousActive, () => {
+          previousActive.classList.remove('active');
+          newActive.classList.add('active');
+          isAnimating = false;
+        });
+      } else if (!previousActive) {
         newActive.classList.add('active');
-        applyGlitch(newActive);
       }
     }
 
     function nextMessage() {
       const currentType = order[currentIndex];
       setActiveMessage(currentType);
-      let duration = DURATIONS[currentType];
+      const duration = DURATIONS[currentType];
       currentIndex = (currentIndex + 1) % order.length;
-      timeoutId = setTimeout(() => {
-        nextMessage();
-      }, duration);
+      timeoutId = setTimeout(nextMessage, duration);
     }
 
     if (timeoutId) clearTimeout(timeoutId);
