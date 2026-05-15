@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Cupom com Ciclo (Aparece/Some)</title>
+  <title>Webcam Overlay - Cupom com Brilho Intenso na Barra</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -43,7 +43,7 @@
       z-index: 3;
     }
 
-    /* BARRA INFERIOR - inicialmente oculta */
+    /* BARRA INFERIOR - brilho muito mais intenso */
     .info-bar {
       position: absolute;
       bottom: 12px;
@@ -57,7 +57,6 @@
       background: rgba(8, 8, 12, 0.3);
       backdrop-filter: blur(4px);
       border-radius: 8px;
-      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 255, 255, 0.5);
       font-family: 'Orbitron', monospace;
       font-weight: 600;
       letter-spacing: 0.5px;
@@ -65,6 +64,10 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.6s ease, visibility 0.6s ease;
+      
+      /* Brilho externo muito mais forte e borda ciano intensa */
+      box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.9), 0 0 20px 5px rgba(0, 255, 255, 0.8), inset 0 0 15px rgba(0, 255, 255, 0.4);
+      border: 1px solid rgba(0, 255, 255, 0.8);
     }
 
     .info-bar.visible {
@@ -79,6 +82,7 @@
       align-items: baseline;
       gap: 5px;
       white-space: nowrap;
+      text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
     }
 
     .coupon-text {
@@ -91,7 +95,7 @@
       font-weight: 900;
       color: #bfff00;
       -webkit-text-fill-color: #bfff00;
-      text-shadow: 0 0 8px #bfff00;
+      text-shadow: 0 0 12px #bfff00, 0 0 4px #bfff00;
       animation: pulsarVerde 2s ease-in-out infinite alternate;
     }
 
@@ -99,12 +103,12 @@
       font-weight: 800;
       color: #00c8ff;
       -webkit-text-fill-color: #00c8ff;
-      text-shadow: 0 0 6px #00a6ff;
+      text-shadow: 0 0 10px #00a6ff, 0 0 4px #00a6ff;
     }
 
     @keyframes pulsarVerde {
       0% { text-shadow: 0 0 4px #bfff00; }
-      100% { text-shadow: 0 0 14px #eaff00, 0 0 18px #caff00; }
+      100% { text-shadow: 0 0 18px #eaff00, 0 0 22px #caff00; }
     }
 
     @media (max-width: 580px) {
@@ -138,22 +142,17 @@
 
   function showBar() {
     bar.classList.add('visible');
-    // Após 15 segundos, esconde
     setTimeout(() => {
       bar.classList.remove('visible');
     }, DELAY_HIDE);
   }
 
-  // Primeira aparição após 2 minutos
   setTimeout(() => {
     showBar();
-    // A partir daí, repete o ciclo a cada 2 minutos + tempo de visibilidade? 
-    // Para que o ciclo seja: desaparece, depois 2 minutos, aparece novamente.
-    // Precisamos agendar a próxima aparição após o fim do tempo de exibição + 2 minutos.
     setInterval(() => {
       showBar();
-    }, DELAY_HIDE + DELAY_SHOW); // 15s + 120s = 135s entre inícios de cada exibição
-  }, DELAY_SHOW); // primeira espera de 2 minutos
+    }, DELAY_HIDE + DELAY_SHOW);
+  }, DELAY_SHOW);
 </script>
 </body>
 </html>
