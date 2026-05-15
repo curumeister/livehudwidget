@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Cupom com Brilho Intenso na Barra</title>
+  <title>Webcam Overlay - Luz RGB Atrás (Vazando para Baixo)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -27,9 +27,11 @@
       position: relative;
       width: 640px;
       height: 360px;
-      border: 3px solid #00ffff;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 0 12px rgba(0, 255, 255, 0.3);
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.3);
       background: transparent;
+      /* Garante que o conteúdo interno não corte a luz */
+      overflow: visible;
     }
 
     .overlay .border-inner {
@@ -38,19 +40,47 @@
       left: 6px;
       right: 6px;
       bottom: 6px;
-      box-shadow: inset 0 0 18px rgba(0, 255, 255, 0.3), inset 0 0 6px rgba(0, 255, 255, 0.5);
+      box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.3), inset 0 0 6px rgba(255, 255, 255, 0.5);
       pointer-events: none;
       z-index: 3;
     }
 
-    /* BARRA INFERIOR - brilho muito mais intenso */
+    /* LUZ RGB - posicionada atrás da sobreposição, vazando apenas para baixo */
+    .rgb-bottom {
+      position: absolute;
+      bottom: -6px;          /* ligeiramente abaixo da borda externa */
+      left: 0;
+      width: 100%;
+      height: 6px;           /* linha fina */
+      background: linear-gradient(90deg, 
+        #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
+      background-size: 400% 100%;
+      animation: rgbMove 6s linear infinite; /* mais lento (6s) */
+      filter: blur(2px);     /* desfoque suave para simular luz espalhada */
+      opacity: 0.9;
+      z-index: 1;            /* atrás da barra de cupom (z-index 10) e da moldura */
+      pointer-events: none;
+      border-radius: 0 0 10px 10px;
+    }
+
+    /* Remove qualquer efeito que suba para cima */
+    .rgb-bottom::after {
+      display: none;
+    }
+
+    @keyframes rgbMove {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 300% 50%; }
+    }
+
+    /* BARRA DE CUPOM (branca neon) - fica na frente */
     .info-bar {
       position: absolute;
       bottom: 12px;
       left: 12px;
       right: 12px;
       height: 48px;
-      z-index: 10;
+      z-index: 10;          /* fica na frente da luz RGB */
       display: flex;
       align-items: center;
       justify-content: center;
@@ -64,10 +94,8 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.6s ease, visibility 0.6s ease;
-      
-      /* Brilho externo muito mais forte e borda ciano intensa */
-      box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.9), 0 0 20px 5px rgba(0, 255, 255, 0.8), inset 0 0 15px rgba(0, 255, 255, 0.4);
-      border: 1px solid rgba(0, 255, 255, 0.8);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 20px 5px rgba(255, 255, 255, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.8);
     }
 
     .info-bar.visible {
@@ -82,7 +110,7 @@
       align-items: baseline;
       gap: 5px;
       white-space: nowrap;
-      text-shadow: 0 0 6px rgba(0, 255, 255, 0.5);
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
     }
 
     .coupon-text {
@@ -93,37 +121,35 @@
     .cupom-highlight {
       font-style: italic;
       font-weight: 900;
-      color: #bfff00;
-      -webkit-text-fill-color: #bfff00;
-      text-shadow: 0 0 12px #bfff00, 0 0 4px #bfff00;
-      animation: pulsarVerde 2s ease-in-out infinite alternate;
+      color: #ffffff;
+      text-shadow: 0 0 12px #ffffff, 0 0 4px #ffffff;
+      animation: pulsarBranco 2s ease-in-out infinite alternate;
     }
 
     .tradeit-highlight {
       font-weight: 800;
-      color: #00c8ff;
-      -webkit-text-fill-color: #00c8ff;
-      text-shadow: 0 0 10px #00a6ff, 0 0 4px #00a6ff;
+      color: #e0e0ff;
+      text-shadow: 0 0 10px #ffffff, 0 0 4px #ffffff;
     }
 
-    @keyframes pulsarVerde {
-      0% { text-shadow: 0 0 4px #bfff00; }
-      100% { text-shadow: 0 0 18px #eaff00, 0 0 22px #caff00; }
+    @keyframes pulsarBranco {
+      0% { text-shadow: 0 0 4px #ffffff; }
+      100% { text-shadow: 0 0 18px #ffffff, 0 0 22px #ffffff; }
     }
 
     @media (max-width: 580px) {
-      .coupon-message {
-        font-size: 1rem;
-      }
-      .info-bar {
-        height: 42px;
-      }
+      .coupon-message { font-size: 1rem; }
+      .info-bar { height: 42px; }
+      .rgb-bottom { height: 4px; bottom: -4px; }
     }
   </style>
 </head>
 <body>
 <div class="overlay">
   <div class="border-inner"></div>
+  <!-- Luz RGB atrás, vazando só para baixo -->
+  <div class="rgb-bottom"></div>
+  <!-- Barra de cupom na frente -->
   <div class="info-bar" id="infoBar">
     <span class="coupon-message">
       <span class="coupon-text">cupom:</span>
@@ -136,9 +162,8 @@
 
 <script>
   const bar = document.getElementById('infoBar');
-  
-  const DELAY_HIDE = 15000;      // 15 segundos visível
-  const DELAY_SHOW = 120000;      // 2 minutos (120000 ms) entre aparições
+  const DELAY_HIDE = 15000;
+  const DELAY_SHOW = 120000;
 
   function showBar() {
     bar.classList.add('visible');
