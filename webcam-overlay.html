@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Backlight RGB Atrás da Barra Neon</title>
+  <title>Webcam Overlay - RGB na Borda Inferior do Widget</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -27,29 +27,31 @@
       position: relative;
       width: 640px;
       height: 360px;
-      border: 3px solid #ffffff;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.3);
+      border: 5px solid #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 0 28px rgba(255, 255, 255, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.4);
       background: transparent;
       overflow: visible;
     }
 
     .overlay .border-inner {
       position: absolute;
-      top: 6px;
-      left: 6px;
-      right: 6px;
-      bottom: 6px;
-      box-shadow: inset 0 0 18px rgba(255, 255, 255, 0.3), inset 0 0 6px rgba(255, 255, 255, 0.5);
+      top: 8px;
+      left: 8px;
+      right: 8px;
+      bottom: 8px;
+      border-radius: 6px;
+      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.6);
       pointer-events: none;
       z-index: 3;
     }
 
-    /* LUZ RGB - atrás da barra, vazando para baixo */
-    .rgb-backlight {
+    /* LUZ RGB NA BORDA INFERIOR DO OVERLAY (atrás da moldura) */
+    .rgb-bottom-edge {
       position: absolute;
-      bottom: 8px;          /* exatamente na altura da base da barra (ajuste fino) */
-      left: 12px;
-      right: 12px;
+      bottom: -4px;            /* rente à borda externa inferior */
+      left: 0;
+      width: 100%;
       height: 6px;
       background: linear-gradient(90deg, 
         #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
@@ -57,9 +59,9 @@
       animation: rgbMove 6s linear infinite;
       filter: blur(3px);
       opacity: 0.9;
-      z-index: 5;           /* abaixo da barra */
+      z-index: 2;              /* atrás da barra, mas visível na borda */
       pointer-events: none;
-      border-radius: 0 0 8px 8px;
+      border-radius: 0 0 10px 10px;
     }
 
     @keyframes rgbMove {
@@ -67,20 +69,20 @@
       100% { background-position: 300% 50%; }
     }
 
-    /* BARRA DE CUPOM - na frente, com borda inferior neon */
+    /* BARRA DE CUPOM - normal, dentro do overlay */
     .info-bar {
       position: absolute;
-      bottom: 12px;
-      left: 12px;
-      right: 12px;
+      bottom: 14px;
+      left: 16px;
+      right: 16px;
       height: 48px;
-      z-index: 10;          /* na frente do RGB */
+      z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
       background: rgba(8, 8, 12, 0.3);
       backdrop-filter: blur(4px);
-      border-radius: 8px;
+      border-radius: 10px;
       font-family: 'Orbitron', monospace;
       font-weight: 600;
       letter-spacing: 0.5px;
@@ -88,11 +90,8 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.6s ease, visibility 0.6s ease;
-      /* Borda dupla: contorno branco + box-shadow intenso */
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 20px 5px rgba(255, 255, 255, 0.8), inset 0 0 15px rgba(255, 255, 255, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      /* Sombra adicional para dar profundidade sobre o RGB */
-      filter: drop-shadow(0 -2px 4px rgba(0,0,0,0.2));
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 22px 6px rgba(255, 255, 255, 0.85), inset 0 0 15px rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.9);
     }
 
     .info-bar.visible {
@@ -136,16 +135,18 @@
 
     @media (max-width: 580px) {
       .coupon-message { font-size: 1rem; }
-      .info-bar { height: 42px; bottom: 10px; }
-      .rgb-backlight { height: 4px; bottom: 6px; }
+      .info-bar { height: 42px; bottom: 12px; left: 14px; right: 14px; }
+      .rgb-bottom-edge { height: 4px; bottom: -2px; }
+      .overlay { border-width: 4px; border-radius: 8px; }
+      .overlay .border-inner { top: 6px; left: 6px; right: 6px; bottom: 6px; border-radius: 4px; }
     }
   </style>
 </head>
 <body>
 <div class="overlay">
   <div class="border-inner"></div>
-  <!-- RGB posicionado exatamente abaixo da barra, atrás -->
-  <div class="rgb-backlight"></div>
+  <!-- RGB na parte inferior da sobreposição (moldura da webcam) -->
+  <div class="rgb-bottom-edge"></div>
   <div class="info-bar" id="infoBar">
     <span class="coupon-message">
       <span class="coupon-text">cupom:</span>
