@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Glitch Suave (Canal + Cupom)</title>
+  <title>Webcam Overlay - Cupom com Ciclo (Aparece/Some)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -43,6 +43,7 @@
       z-index: 3;
     }
 
+    /* BARRA INFERIOR - inicialmente oculta */
     .info-bar {
       position: absolute;
       bottom: 12px;
@@ -61,86 +62,16 @@
       font-weight: 600;
       letter-spacing: 0.5px;
       overflow: hidden;
-    }
-
-    .info-bar .message {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 20px;
       opacity: 0;
-      transition: opacity 0.2s ease-in-out;
-      pointer-events: none;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      visibility: hidden;
+      transition: opacity 0.6s ease, visibility 0.6s ease;
     }
 
-    .info-bar .message.active {
+    .info-bar.visible {
       opacity: 1;
+      visibility: visible;
     }
 
-    /* Glitch apenas na saída */
-    .glitch-out {
-      animation: glitch-out 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
-
-    @keyframes glitch-out {
-      0% {
-        transform: translate(0);
-        text-shadow: -1px 0 #ff00c1, 1px 0 #00ffff;
-        opacity: 1;
-      }
-      25% {
-        transform: translate(-1px, 0.5px);
-        text-shadow: -1px 0 #ff00c1, 1px 0 #00ffff;
-      }
-      50% {
-        transform: translate(1px, -0.5px);
-        text-shadow: 1px 0 #ff00c1, -1px 0 #00ffff;
-        opacity: 0.9;
-      }
-      75% {
-        transform: translate(-0.5px, 1px);
-        text-shadow: -0.5px 0 #ff00c1, 0.5px 0 #00ffff;
-      }
-      100% {
-        transform: translate(0);
-        text-shadow: none;
-        opacity: 0;
-      }
-    }
-
-    /* Canal */
-    .info-bar .channel {
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.95);
-      font-size: 1.2rem;
-      display: flex;
-      align-items: baseline;
-      gap: 6px;
-    }
-
-    .channel-highlight {
-      background: linear-gradient(135deg, #00ffff, #0088ff, #00ffff);
-      background-size: 200% auto;
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 900;
-      text-shadow: 0 0 6px rgba(0, 255, 255, 0.6);
-    }
-
-    .channel em {
-      font-style: italic;
-      font-weight: 500;
-      color: #dddddd;
-      margin: 0 2px;
-    }
-
-    /* Cupom - textos normais em branco */
     .coupon-message {
       font-weight: 700;
       font-size: 1.2rem;
@@ -177,7 +108,6 @@
     }
 
     @media (max-width: 580px) {
-      .info-bar .channel,
       .coupon-message {
         font-size: 1rem;
       }
@@ -190,75 +120,40 @@
 <body>
 <div class="overlay">
   <div class="border-inner"></div>
-  <div class="info-bar">
-    <div class="message active" id="channelMessage">
-      <span class="channel">opiordocs <em>by</em> <span class="channel-highlight">curumeister</span></span>
-    </div>
-    <div class="message" id="couponMessage">
-      <span class="coupon-message">
-        <span class="coupon-text">cupom:</span>
-        <span class="cupom-highlight">CURU</span>
-        <span class="coupon-text">na</span>
-        <span class="tradeit-highlight">TRADEIT.GG</span>
-      </span>
-    </div>
+  <div class="info-bar" id="infoBar">
+    <span class="coupon-message">
+      <span class="coupon-text">cupom:</span>
+      <span class="cupom-highlight">CURU</span>
+      <span class="coupon-text">na</span>
+      <span class="tradeit-highlight">TRADEIT.GG</span>
+    </span>
   </div>
 </div>
 
 <script>
-  (function() {
-    const channelDiv = document.getElementById('channelMessage');
-    const couponDiv = document.getElementById('couponMessage');
-    
-    const DURATIONS = {
-      channel: 45000,
-      coupon: 15000
-    };
+  const bar = document.getElementById('infoBar');
+  
+  const DELAY_HIDE = 15000;      // 15 segundos visível
+  const DELAY_SHOW = 120000;      // 2 minutos (120000 ms) entre aparições
 
-    const order = ['channel', 'coupon'];
-    let currentIndex = 0;
-    let timeoutId = null;
-    let isAnimating = false;
+  function showBar() {
+    bar.classList.add('visible');
+    // Após 15 segundos, esconde
+    setTimeout(() => {
+      bar.classList.remove('visible');
+    }, DELAY_HIDE);
+  }
 
-    function applyGlitchOut(element, callback) {
-      if (!element) return;
-      element.classList.add('glitch-out');
-      setTimeout(() => {
-        element.classList.remove('glitch-out');
-        if (callback) callback();
-      }, 200);
-    }
-
-    function setActiveMessage(type) {
-      const previousActive = document.querySelector('.info-bar .message.active');
-      const newActive = type === 'channel' ? channelDiv : couponDiv;
-      
-      if (!newActive) return;
-      if (isAnimating) return;
-      
-      if (previousActive && previousActive !== newActive) {
-        isAnimating = true;
-        applyGlitchOut(previousActive, () => {
-          previousActive.classList.remove('active');
-          newActive.classList.add('active');
-          isAnimating = false;
-        });
-      } else if (!previousActive) {
-        newActive.classList.add('active');
-      }
-    }
-
-    function nextMessage() {
-      const currentType = order[currentIndex];
-      setActiveMessage(currentType);
-      const duration = DURATIONS[currentType];
-      currentIndex = (currentIndex + 1) % order.length;
-      timeoutId = setTimeout(nextMessage, duration);
-    }
-
-    if (timeoutId) clearTimeout(timeoutId);
-    nextMessage();
-  })();
+  // Primeira aparição após 2 minutos
+  setTimeout(() => {
+    showBar();
+    // A partir daí, repete o ciclo a cada 2 minutos + tempo de visibilidade? 
+    // Para que o ciclo seja: desaparece, depois 2 minutos, aparece novamente.
+    // Precisamos agendar a próxima aparição após o fim do tempo de exibição + 2 minutos.
+    setInterval(() => {
+      showBar();
+    }, DELAY_HIDE + DELAY_SHOW); // 15s + 120s = 135s entre inícios de cada exibição
+  }, DELAY_SHOW); // primeira espera de 2 minutos
 </script>
 </body>
 </html>
