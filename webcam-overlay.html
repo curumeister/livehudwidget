@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - RGB na Borda Inferior do Widget</title>
+  <title>Webcam Overlay - Borda Grossa (8px)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -27,62 +27,39 @@
       position: relative;
       width: 640px;
       height: 360px;
-      border: 5px solid #ffffff;
-      border-radius: 10px;
-      box-shadow: 0 0 28px rgba(255, 255, 255, 0.9), inset 0 0 15px rgba(255, 255, 255, 0.4);
+      border: 8px solid #ffffff;           /* borda mais grossa (antes 5px) */
+      border-radius: 12px;                 /* cantos levemente maiores */
+      box-shadow: 0 0 32px rgba(255, 255, 255, 0.9), inset 0 0 18px rgba(255, 255, 255, 0.4);
       background: transparent;
       overflow: visible;
     }
 
     .overlay .border-inner {
       position: absolute;
-      top: 8px;
-      left: 8px;
-      right: 8px;
-      bottom: 8px;
-      border-radius: 6px;
-      box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 8px rgba(255, 255, 255, 0.6);
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border-radius: 8px;
+      box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.7);
       pointer-events: none;
       z-index: 3;
     }
 
-    /* LUZ RGB NA BORDA INFERIOR DO OVERLAY (atrás da moldura) */
-    .rgb-bottom-edge {
-      position: absolute;
-      bottom: -4px;            /* rente à borda externa inferior */
-      left: 0;
-      width: 100%;
-      height: 6px;
-      background: linear-gradient(90deg, 
-        #ff0000, #ff00ff, #0000ff, #00ffff, #00ff00, #ffff00, #ff0000);
-      background-size: 400% 100%;
-      animation: rgbMove 6s linear infinite;
-      filter: blur(3px);
-      opacity: 0.9;
-      z-index: 2;              /* atrás da barra, mas visível na borda */
-      pointer-events: none;
-      border-radius: 0 0 10px 10px;
-    }
-
-    @keyframes rgbMove {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
-    }
-
-    /* BARRA DE CUPOM - normal, dentro do overlay */
+    /* BARRA DE CUPOM (branca neon) */
     .info-bar {
       position: absolute;
-      bottom: 14px;
-      left: 16px;
-      right: 16px;
-      height: 48px;
+      bottom: 16px;
+      left: 18px;
+      right: 18px;
+      height: 52px;
       z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
       background: rgba(8, 8, 12, 0.3);
       backdrop-filter: blur(4px);
-      border-radius: 10px;
+      border-radius: 12px;
       font-family: 'Orbitron', monospace;
       font-weight: 600;
       letter-spacing: 0.5px;
@@ -90,7 +67,7 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.6s ease, visibility 0.6s ease;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 22px 6px rgba(255, 255, 255, 0.85), inset 0 0 15px rgba(255, 255, 255, 0.4);
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 26px 8px rgba(255, 255, 255, 0.85), inset 0 0 18px rgba(255, 255, 255, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.9);
     }
 
@@ -101,12 +78,12 @@
 
     .coupon-message {
       font-weight: 700;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       display: flex;
       align-items: baseline;
-      gap: 5px;
+      gap: 6px;
       white-space: nowrap;
-      text-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
     }
 
     .coupon-text {
@@ -118,35 +95,32 @@
       font-style: italic;
       font-weight: 900;
       color: #bfff00;
-      text-shadow: 0 0 12px #bfff00, 0 0 4px #bfff00;
+      text-shadow: 0 0 14px #bfff00, 0 0 6px #bfff00;
       animation: pulsarVerde 2s ease-in-out infinite alternate;
     }
 
     .tradeit-highlight {
       font-weight: 800;
       color: #00c8ff;
-      text-shadow: 0 0 10px #00c8ff, 0 0 4px #00c8ff;
+      text-shadow: 0 0 12px #00c8ff, 0 0 6px #00c8ff;
     }
 
     @keyframes pulsarVerde {
       0% { text-shadow: 0 0 4px #bfff00; }
-      100% { text-shadow: 0 0 18px #eaff00, 0 0 22px #caff00; }
+      100% { text-shadow: 0 0 20px #eaff00, 0 0 26px #caff00; }
     }
 
     @media (max-width: 580px) {
       .coupon-message { font-size: 1rem; }
-      .info-bar { height: 42px; bottom: 12px; left: 14px; right: 14px; }
-      .rgb-bottom-edge { height: 4px; bottom: -2px; }
-      .overlay { border-width: 4px; border-radius: 8px; }
-      .overlay .border-inner { top: 6px; left: 6px; right: 6px; bottom: 6px; border-radius: 4px; }
+      .info-bar { height: 46px; bottom: 14px; left: 14px; right: 14px; border-radius: 10px; }
+      .overlay { border-width: 6px; border-radius: 10px; }
+      .overlay .border-inner { top: 8px; left: 8px; right: 8px; bottom: 8px; border-radius: 6px; }
     }
   </style>
 </head>
 <body>
 <div class="overlay">
   <div class="border-inner"></div>
-  <!-- RGB na parte inferior da sobreposição (moldura da webcam) -->
-  <div class="rgb-bottom-edge"></div>
   <div class="info-bar" id="infoBar">
     <span class="coupon-message">
       <span class="coupon-text">cupom:</span>
