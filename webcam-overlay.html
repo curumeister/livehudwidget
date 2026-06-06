@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Dourado + Azul Escuro com Contorno</title>
+  <title>Webcam Overlay - Cupom 25%</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -46,18 +46,20 @@
       z-index: 3;
     }
 
-    /* BARRA DE CUPOM */
+    /* BARRA DE CUPOM – agora com altura automática para acomodar texto maior */
     .info-bar {
       position: absolute;
       top: 16px;
       left: 18px;
       right: 18px;
-      height: 52px;
+      min-height: 52px;
+      height: auto;
+      padding: 10px 14px;
       z-index: 10;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(0, 0, 0, 0.8);
+      background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(5px);
       border-radius: 0;
       font-family: 'Orbitron', monospace;
@@ -81,37 +83,35 @@
       font-size: 1.3rem;
       display: flex;
       align-items: baseline;
+      justify-content: center;
+      flex-wrap: wrap;
       gap: 6px;
-      white-space: nowrap;
-      text-shadow: 0 0 8px rgba(218, 165, 32, 0.5);
+      text-align: center;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      white-space: normal;
     }
 
     .coupon-text {
-      color: #DAA520;
+      color: #ffffff;
       font-weight: 500;
     }
 
     .cupom-highlight {
       font-style: italic;
       font-weight: 900;
-      color: #DAA520;
+      color: #ffffff;
       text-shadow: none;
     }
 
-    /* TRADEIT.GG em azul escuro com contorno branco */
     .tradeit-highlight {
       font-weight: 800;
-      color: #0b2b5e;
-      text-shadow:
-        -1px -1px 0 #ffffff,
-         1px -1px 0 #ffffff,
-        -1px  1px 0 #ffffff,
-         1px  1px 0 #ffffff;
+      color: #ffffff;
+      text-shadow: none;
     }
 
     @media (max-width: 580px) {
       .coupon-message { font-size: 1rem; }
-      .info-bar { height: 46px; top: 14px; left: 14px; right: 14px; }
+      .info-bar { top: 14px; left: 14px; right: 14px; }
       .overlay { border-width: 4px; }
       .overlay .border-inner { top: 8px; left: 8px; right: 8px; bottom: 8px; }
     }
@@ -122,10 +122,11 @@
   <div class="border-inner"></div>
   <div class="info-bar" id="infoBar">
     <span class="coupon-message">
-      <span class="coupon-text">cupom:</span>
+      <span class="coupon-text">cupom</span>
       <span class="cupom-highlight">CURU</span>
       <span class="coupon-text">na</span>
       <span class="tradeit-highlight">TRADEIT.GG</span>
+      <span class="coupon-text">te dá até 25% de desconto</span>
     </span>
   </div>
 </div>
