@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Borda Grossa (8px)</title>
+  <title>Webcam Overlay - Dourado + Azul Escuro com Contorno</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -25,11 +25,11 @@
 
     .overlay {
       position: relative;
-      width: 640px;
-      height: 360px;
-      border: 8px solid #ffffff;           /* borda mais grossa (antes 5px) */
-      border-radius: 12px;                 /* cantos levemente maiores */
-      box-shadow: 0 0 32px rgba(255, 255, 255, 0.9), inset 0 0 18px rgba(255, 255, 255, 0.4);
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 5px solid #B8860B;
+      border-radius: 0;
+      box-shadow: 0 0 28px rgba(184, 134, 11, 0.85), inset 0 0 16px rgba(218, 165, 32, 0.35);
       background: transparent;
       overflow: visible;
     }
@@ -40,16 +40,16 @@
       left: 10px;
       right: 10px;
       bottom: 10px;
-      border-radius: 8px;
-      box-shadow: inset 0 0 24px rgba(255, 255, 255, 0.5), inset 0 0 10px rgba(255, 255, 255, 0.7);
+      border-radius: 0;
+      box-shadow: inset 0 0 22px rgba(218, 165, 32, 0.5), inset 0 0 8px rgba(184, 134, 11, 0.7);
       pointer-events: none;
       z-index: 3;
     }
 
-    /* BARRA DE CUPOM (branca neon) */
+    /* BARRA DE CUPOM */
     .info-bar {
       position: absolute;
-      bottom: 16px;
+      top: 16px;
       left: 18px;
       right: 18px;
       height: 52px;
@@ -57,9 +57,9 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(8, 8, 12, 0.3);
-      backdrop-filter: blur(4px);
-      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      border-radius: 0;
       font-family: 'Orbitron', monospace;
       font-weight: 600;
       letter-spacing: 0.5px;
@@ -67,8 +67,8 @@
       opacity: 0;
       visibility: hidden;
       transition: opacity 0.6s ease, visibility 0.6s ease;
-      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9), 0 0 26px 8px rgba(255, 255, 255, 0.85), inset 0 0 18px rgba(255, 255, 255, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 0 2px #B8860B, 0 0 22px 6px rgba(184, 134, 11, 0.8), inset 0 0 16px rgba(218, 165, 32, 0.35);
+      border: 1px solid #DAA520;
     }
 
     .info-bar.visible {
@@ -83,38 +83,37 @@
       align-items: baseline;
       gap: 6px;
       white-space: nowrap;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+      text-shadow: 0 0 8px rgba(218, 165, 32, 0.5);
     }
 
     .coupon-text {
-      color: #f0f0f0;
+      color: #DAA520;
       font-weight: 500;
     }
 
     .cupom-highlight {
       font-style: italic;
       font-weight: 900;
-      color: #bfff00;
-      text-shadow: 0 0 14px #bfff00, 0 0 6px #bfff00;
-      animation: pulsarVerde 2s ease-in-out infinite alternate;
+      color: #DAA520;
+      text-shadow: none;
     }
 
+    /* TRADEIT.GG em azul escuro com contorno branco */
     .tradeit-highlight {
       font-weight: 800;
-      color: #00c8ff;
-      text-shadow: 0 0 12px #00c8ff, 0 0 6px #00c8ff;
-    }
-
-    @keyframes pulsarVerde {
-      0% { text-shadow: 0 0 4px #bfff00; }
-      100% { text-shadow: 0 0 20px #eaff00, 0 0 26px #caff00; }
+      color: #0b2b5e;
+      text-shadow:
+        -1px -1px 0 #ffffff,
+         1px -1px 0 #ffffff,
+        -1px  1px 0 #ffffff,
+         1px  1px 0 #ffffff;
     }
 
     @media (max-width: 580px) {
       .coupon-message { font-size: 1rem; }
-      .info-bar { height: 46px; bottom: 14px; left: 14px; right: 14px; border-radius: 10px; }
-      .overlay { border-width: 6px; border-radius: 10px; }
-      .overlay .border-inner { top: 8px; left: 8px; right: 8px; bottom: 8px; border-radius: 6px; }
+      .info-bar { height: 46px; top: 14px; left: 14px; right: 14px; }
+      .overlay { border-width: 4px; }
+      .overlay .border-inner { top: 8px; left: 8px; right: 8px; bottom: 8px; }
     }
   </style>
 </head>
@@ -134,7 +133,8 @@
 <script>
   const bar = document.getElementById('infoBar');
   const DELAY_HIDE = 15000;
-  const DELAY_SHOW = 120000;
+  const INITIAL_DELAY = 5000;
+  const REPEAT_INTERVAL = 90000;
 
   function showBar() {
     bar.classList.add('visible');
@@ -147,8 +147,8 @@
     showBar();
     setInterval(() => {
       showBar();
-    }, DELAY_HIDE + DELAY_SHOW);
-  }, DELAY_SHOW);
+    }, DELAY_HIDE + REPEAT_INTERVAL);
+  }, INITIAL_DELAY);
 </script>
 </body>
 </html>
