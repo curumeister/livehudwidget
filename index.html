@@ -1,376 +1,190 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Widget Clima + Câmbio - 3 Cidades</title>
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
-}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Clima Minimalista - 3 Cidades</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-body {
-  background: transparent;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
+    body {
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+    }
 
-.bordered-container {
-  position: relative;
-  width: 500px;
-  background: transparent;
-  border-radius: 20px;
-  isolation: isolate;
-  overflow: hidden;
-}
+    .weather-widget {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
+      border-radius: 40px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      color: #ffffff;
+      transition: opacity 0.5s ease;
+      opacity: 1;
+    }
 
-.bordered-container::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 20px;
-  padding: 2px;
-  background: linear-gradient(135deg, #ff9a4a, #b86eff, #ff9a4a);
-  background-size: 250% 250%;
-  animation: bordaSuave 8s ease infinite;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.9;
-}
+    .weather-widget.fade {
+      opacity: 0;
+    }
 
-@keyframes bordaSuave {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 200% 50%; }
-}
+    .weather-icon {
+      font-size: 2rem;
+      line-height: 1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
 
-.inner-flex {
-  display: flex;
-  width: 100%;
-  background: rgba(20, 20, 30, 0.7);
-  backdrop-filter: blur(10px);
-  border-radius: 18px;
-  gap: 0;
-}
+    .weather-info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+    }
 
-.widget-clima {
-  width: 340px;
-  padding: 6px 12px;
-  flex-shrink: 0;
-}
+    .temperature {
+      font-size: 1.8rem;
+      font-weight: 500;
+      letter-spacing: -0.5px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
 
-.stack {
-  position: relative;
-  height: 42px;
-  width: 100%;
-  z-index: 2;
-  overflow: hidden;
-}
+    .city {
+      font-size: 0.75rem;
+      font-weight: 400;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
 
-.item {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 10px;
-  opacity: 0;
-  transform: translateY(0);
-  transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1), opacity 0.35s ease;
-  pointer-events: none;
-  padding-left: 4px;
-}
-
-.item.active {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.item.exit-down {
-  transform: translateY(100%);
-  opacity: 0;
-}
-
-.item.enter-up {
-  transform: translateY(-100%);
-  opacity: 0;
-}
-
-.enter-up.active {
-  transform: translateY(0) !important;
-  opacity: 1 !important;
-}
-
-.icon {
-  font-size: 22px;
-  min-width: 32px;
-  text-align: center;
-}
-
-.value {
-  font-size: 20px;
-  font-weight: 700;
-  color: #ffffff;
-  min-width: 70px;
-  text-align: left;
-}
-
-.label {
-  font-size: 15px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 130px;
-  text-align: left;
-}
-
-.livepix-space {
-  flex-grow: 1;
-  min-width: 160px;
-  background: transparent;
-  pointer-events: auto;
-}
-
-@media (max-width: 540px) {
-  .bordered-container { width: 460px; }
-  .widget-clima { width: 300px; }
-  .livepix-space { min-width: 120px; }
-  .stack { height: 38px; }
-  .icon { font-size: 20px; min-width: 28px; }
-  .value { font-size: 18px; min-width: 60px; }
-  .label { font-size: 13px; max-width: 110px; }
-  .item { gap: 8px; }
-}
-</style>
+    @media (max-width: 480px) {
+      .weather-widget {
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 30px;
+      }
+      .weather-icon { font-size: 1.5rem; }
+      .temperature { font-size: 1.4rem; }
+      .city { font-size: 0.65rem; }
+    }
+  </style>
 </head>
 <body>
-<div class="bordered-container">
-  <div class="inner-flex">
-    <div class="widget-clima">
-      <div class="stack">
-        <div class="item active" id="weatherA">
-          <div class="icon">🌡️</div>
-          <div class="value">--°C</div>
-          <div class="label">Clima</div>
-        </div>
-        <div class="item" id="weatherB">
-          <div class="icon"></div>
-          <div class="value"></div>
-          <div class="label"></div>
-        </div>
-      </div>
+  <div class="weather-widget" id="weatherWidget">
+    <span class="weather-icon" id="weatherIcon">☀️</span>
+    <div class="weather-info">
+      <span class="temperature" id="temperature">--°</span>
+      <span class="city" id="city">São Paulo</span>
     </div>
-    <div class="livepix-space" id="livepixSpace"></div>
   </div>
-</div>
 
-<script>
-const API_KEY = "46f49c9551bea5305c63071f37f9622d";
+  <script>
+    // ===== CONFIGURAÇÃO =====
+    const API_KEY = '46f49c9551bea5305c63071f37f9622d';
+    
+    const CITIES = [
+      { name: 'São Paulo',     lat: -23.5505, lon: -46.6333 },
+      { name: 'Rio de Janeiro', lat: -22.9068, lon: -43.1729 },
+      { name: 'Belo Horizonte', lat: -19.9167, lon: -43.9345 }
+    ];
+    
+    const ROTATION_INTERVAL = 20000; // 20 segundos
+    // =========================
 
-// ========== APENAS 3 CIDADES ==========
-const cities = [
-  { name: "Belo Horizonte", country: "BR", type: "weather" },
-  { name: "São Paulo", country: "BR", type: "weather" },
-  { name: "Rio de Janeiro", country: "BR", type: "weather" }
-];
+    const weatherWidget = document.getElementById('weatherWidget');
+    const weatherIconEl = document.getElementById('weatherIcon');
+    const temperatureEl = document.getElementById('temperature');
+    const cityEl = document.getElementById('city');
 
-// Itens de câmbio (USD, EUR, BTC)
-const exchangeItems = [
-  { label: "USD", icon: "💵", type: "usd" },
-  { label: "EUR", icon: "💶", type: "eur" },
-  { label: "BTC", icon: "₿", type: "btc" }
-];
+    let currentCityIndex = 0;
+    let rotationTimer = null;
+    let cachedData = {}; // Armazena dados para troca rápida
 
-let displayItems = []; // array final: [clima1, clima2, clima3, usd, eur, btc]
-let currentIndex = 0;
-let animating = false;
-let activeIsA = true;
-let cycleTimeout = null;
-
-const DISPLAY_DURATION = 4650;   // ms por item
-const ANIMATION_DURATION = 350;
-
-function formatCurrency(value) {
-  if (isNaN(value) || value === null) return "R$ --";
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-}
-
-function formatBTC(value) {
-  if (isNaN(value) || value === null) return "R$ --";
-  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
-}
-
-// Busca clima de uma cidade
-async function fetchWeatherForCity(city) {
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.name},${city.country}&units=metric&appid=${API_KEY}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Clima ${city.name}: ${res.status}`);
-  const data = await res.json();
-  const emoji = getWeatherEmoji(data.weather[0].icon);
-  return {
-    icon: emoji,
-    value: `${Math.round(data.main.temp)}°C`,
-    label: city.name,
-    type: "weather"
-  };
-}
-
-// Buscas de câmbio
-async function fetchUSD() {
-  const res = await fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL");
-  const json = await res.json();
-  return { value: formatCurrency(parseFloat(json.USDBRL.bid)) };
-}
-async function fetchEUR() {
-  const res = await fetch("https://economia.awesomeapi.com.br/json/last/EUR-BRL");
-  const json = await res.json();
-  return { value: formatCurrency(parseFloat(json.EURBRL.bid)) };
-}
-async function fetchBTC() {
-  const res = await fetch("https://api.binance.com/api/v3/ticker/price?symbol=BTCBRL");
-  const json = await res.json();
-  return { value: formatBTC(parseFloat(json.price)) };
-}
-
-// Atualiza os valores de câmbio no array displayItems
-async function updateExchangeRates() {
-  try {
-    const [usdData, eurData, btcData] = await Promise.all([fetchUSD(), fetchEUR(), fetchBTC()]);
-    const startIdx = cities.length; // índice onde começam os câmbios (3)
-    if (displayItems[startIdx]) displayItems[startIdx].value = usdData.value;
-    if (displayItems[startIdx + 1]) displayItems[startIdx + 1].value = eurData.value;
-    if (displayItems[startIdx + 2]) displayItems[startIdx + 2].value = btcData.value;
-
-    // Se o item atualmente visível for câmbio, atualiza o DOM
-    const activeElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
-    if (displayItems[currentIndex] && (displayItems[currentIndex].type === "usd" || displayItems[currentIndex].type === "eur" || displayItems[currentIndex].type === "btc")) {
-      activeElem.querySelector(".value").textContent = displayItems[currentIndex].value;
+    // Mapeamento de códigos OpenWeather para emojis
+    function getWeatherEmoji(code) {
+      if (code >= 200 && code < 300) return '⛈️';  // Trovoadas
+      if (code >= 300 && code < 400) return '🌦️';  // Garoa
+      if (code >= 500 && code < 600) return '🌧️';  // Chuva
+      if (code >= 600 && code < 700) return '❄️';  // Neve
+      if (code >= 700 && code < 800) return '🌫️';  // Neblina
+      if (code === 800) return '☀️';                // Limpo
+      if (code === 801) return '🌤️';                // Poucas nuvens
+      if (code >= 802) return '☁️';                 // Nublado
+      return '🌡️';
     }
-  } catch (err) {
-    console.error("Erro ao atualizar câmbio:", err);
-  }
-}
 
-// Busca todos os climas das 3 cidades e monta displayItems
-async function fetchAllWeather() {
-  try {
-    const weatherPromises = cities.map(c => fetchWeatherForCity(c));
-    const weatherResults = await Promise.all(weatherPromises);
-    displayItems = [...weatherResults];
-    // Adiciona itens de câmbio com valores placeholder
-    displayItems.push({ icon: "💵", value: "R$ --", label: "USD", type: "usd" });
-    displayItems.push({ icon: "💶", value: "R$ --", label: "EUR", type: "eur" });
-    displayItems.push({ icon: "₿", value: "R$ --", label: "BTC", type: "btc" });
-    await updateExchangeRates(); // preenche os valores reais
-  } catch (err) {
-    console.error("Falha ao buscar climas:", err);
-    // Fallback
-    displayItems = cities.map(c => ({ icon: "🌡️", value: "--°C", label: c.name, type: "weather" }));
-    displayItems.push({ icon: "💵", value: "R$ --", label: "USD", type: "usd" });
-    displayItems.push({ icon: "💶", value: "R$ --", label: "EUR", type: "eur" });
-    displayItems.push({ icon: "₿", value: "R$ --", label: "BTC", type: "btc" });
-  }
-}
-
-function getWeatherEmoji(iconCode) {
-  const mapping = {
-    "01d": "☀️", "01n": "🌙", "02d": "⛅", "02n": "☁️",
-    "03d": "☁️", "03n": "☁️", "04d": "☁️", "04n": "☁️",
-    "09d": "🌧️", "09n": "🌧️", "10d": "🌦️", "10n": "🌧️",
-    "11d": "⛈️", "11n": "⛈️", "13d": "❄️", "13n": "❄️",
-    "50d": "🌫️", "50n": "🌫️"
-  };
-  return mapping[iconCode] || "🌡️";
-}
-
-// Troca para o próximo item (sem gap)
-function swapToNextItem() {
-  if (animating || displayItems.length === 0) return;
-
-  const nextIndex = (currentIndex + 1) % displayItems.length;
-  const nextData = displayItems[nextIndex];
-  const currentElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
-  const nextElem = activeIsA ? document.getElementById("weatherB") : document.getElementById("weatherA");
-
-  nextElem.querySelector(".icon").textContent = nextData.icon;
-  nextElem.querySelector(".value").textContent = nextData.value;
-  nextElem.querySelector(".label").textContent = nextData.label;
-
-  nextElem.classList.remove("active", "exit-down", "enter-up");
-  currentElem.classList.remove("enter-up");
-  void nextElem.offsetHeight;
-  currentElem.classList.add("exit-down");
-  currentElem.classList.remove("active");
-  nextElem.classList.add("enter-up");
-  void nextElem.offsetHeight;
-  nextElem.classList.add("active");
-  nextElem.classList.remove("enter-up");
-
-  animating = true;
-
-  const onFinish = () => {
-    currentElem.classList.remove("exit-down", "active");
-    nextElem.classList.remove("enter-up");
-    activeIsA = !activeIsA;
-    currentIndex = nextIndex;
-    animating = false;
-    if (cycleTimeout) clearTimeout(cycleTimeout);
-    cycleTimeout = setTimeout(() => swapToNextItem(), DISPLAY_DURATION);
-    currentElem.removeEventListener("transitionend", onFinish);
-  };
-  currentElem.addEventListener("transitionend", onFinish, { once: true });
-  setTimeout(() => { if (animating) onFinish(); }, ANIMATION_DURATION + 50);
-}
-
-// Inicialização
-async function init() {
-  await fetchAllWeather();
-  const firstElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
-  if (displayItems[0]) {
-    firstElem.querySelector(".icon").textContent = displayItems[0].icon;
-    firstElem.querySelector(".value").textContent = displayItems[0].value;
-    firstElem.querySelector(".label").textContent = displayItems[0].label;
-  }
-  cycleTimeout = setTimeout(() => swapToNextItem(), DISPLAY_DURATION);
-}
-
-// Atualiza clima a cada 15 min (apenas para as 3 cidades)
-setInterval(async () => {
-  try {
-    const newWeather = await Promise.all(cities.map(c => fetchWeatherForCity(c)));
-    for (let i = 0; i < cities.length; i++) {
-      if (displayItems[i]) {
-        displayItems[i].icon = newWeather[i].icon;
-        displayItems[i].value = newWeather[i].value;
+    async function fetchWeatherForCity(city) {
+      try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${API_KEY}&units=metric&lang=pt`;
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        return {
+          temp: Math.round(data.main.temp),
+          weatherCode: data.weather[0].id,
+          name: city.name
+        };
+      } catch (error) {
+        console.error(`Erro ao buscar clima para ${city.name}:`, error);
+        return null;
       }
     }
-    const activeElem = activeIsA ? document.getElementById("weatherA") : document.getElementById("weatherB");
-    if (displayItems[currentIndex] && displayItems[currentIndex].type === "weather") {
-      activeElem.querySelector(".icon").textContent = displayItems[currentIndex].icon;
-      activeElem.querySelector(".value").textContent = displayItems[currentIndex].value;
-      activeElem.querySelector(".label").textContent = displayItems[currentIndex].label;
+
+    async function updateAllCities() {
+      const promises = CITIES.map(city => fetchWeatherForCity(city));
+      const results = await Promise.all(promises);
+      
+      results.forEach((data, index) => {
+        if (data) cachedData[index] = data;
+      });
+      
+      // Atualiza exibição com a cidade atual
+      updateDisplay();
     }
-  } catch (err) { console.error("Erro atualização clima:", err); }
-}, 15 * 60 * 1000);
 
-// Atualiza câmbio a cada 30 segundos
-setInterval(() => updateExchangeRates(), 30000);
+    function updateDisplay() {
+      const data = cachedData[currentCityIndex];
+      if (!data) return;
+      
+      temperatureEl.textContent = `${data.temp}°`;
+      weatherIconEl.textContent = getWeatherEmoji(data.weatherCode);
+      cityEl.textContent = data.name;
+    }
 
-init();
-</script>
+    function rotateCity() {
+      weatherWidget.classList.add('fade');
+      
+      setTimeout(() => {
+        currentCityIndex = (currentCityIndex + 1) % CITIES.length;
+        updateDisplay();
+        weatherWidget.classList.remove('fade');
+      }, 500); // Meio segundo de fade out
+    }
+
+    // Inicialização
+    async function init() {
+      await updateAllCities();
+      
+      // Inicia rotação
+      rotationTimer = setInterval(rotateCity, ROTATION_INTERVAL);
+      
+      // Atualiza dados a cada 10 minutos (suficiente para clima)
+      setInterval(updateAllCities, 10 * 60 * 1000);
+    }
+
+    init();
+  </script>
 </body>
 </html>
