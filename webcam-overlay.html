@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Cupom 25%</title>
+  <title>Webcam Overlay - Cupom 25% (Contorno Preto)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -46,7 +46,7 @@
       z-index: 3;
     }
 
-    /* BARRA DE CUPOM – agora com altura automática para acomodar texto maior */
+    /* BARRA DE CUPOM */
     .info-bar {
       position: absolute;
       top: 16px;
@@ -91,22 +91,37 @@
       white-space: normal;
     }
 
+    /* Texto padrão com contorno preto */
     .coupon-text {
       color: #ffffff;
       font-weight: 500;
+      text-shadow:
+        -1px -1px 0 #000000,
+         1px -1px 0 #000000,
+        -1px  1px 0 #000000,
+         1px  1px 0 #000000,
+        0 0 6px rgba(255, 255, 255, 0.3);
     }
 
     .cupom-highlight {
       font-style: italic;
       font-weight: 900;
       color: #ffffff;
-      text-shadow: none;
+      text-shadow:
+        -1px -1px 0 #000000,
+         1px -1px 0 #000000,
+        -1px  1px 0 #000000,
+         1px  1px 0 #000000;
     }
 
     .tradeit-highlight {
       font-weight: 800;
       color: #ffffff;
-      text-shadow: none;
+      text-shadow:
+        -1px -1px 0 #000000,
+         1px -1px 0 #000000,
+        -1px  1px 0 #000000,
+         1px  1px 0 #000000;
     }
 
     @media (max-width: 580px) {
