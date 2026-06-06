@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Clima Minimalista - 3 Cidades</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+  <title>Clima 3 Cidades - Grande e Nítido</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -21,31 +21,35 @@
       font-family: 'Inter', sans-serif;
       user-select: none;
       -webkit-font-smoothing: antialiased;
+      /* Aumenta a base do documento para 24px (bem maior) */
+      font-size: 24px;
     }
 
     .weather-widget {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 8px 16px;
-      border-radius: 40px;
-      background: rgba(0, 0, 0, 0.25);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      gap: 16px;
+      padding: 12px 28px;
+      border-radius: 60px;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
       color: #ffffff;
       transition: opacity 0.5s ease;
       opacity: 1;
+      /* Tamanho mínimo para garantir que não fique pequeno */
+      min-width: 220px;
     }
 
-    .weather-widget.fade {
-      opacity: 0;
+    .weather-widget.loading {
+      opacity: 0.7;
     }
 
     .weather-icon {
-      font-size: 2rem;
+      font-size: 2.8rem;
       line-height: 1;
-      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
     }
 
     .weather-info {
@@ -55,136 +59,126 @@
     }
 
     .temperature {
-      font-size: 1.8rem;
+      font-size: 2.5rem;
       font-weight: 500;
-      letter-spacing: -0.5px;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      letter-spacing: -1px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
 
     .city {
-      font-size: 0.75rem;
+      font-size: 1rem;
       font-weight: 400;
-      opacity: 0.8;
+      opacity: 0.85;
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+
+    /* Responsivo para telas menores, mas ainda grande */
     @media (max-width: 480px) {
-      .weather-widget {
-        gap: 8px;
-        padding: 6px 14px;
-        border-radius: 30px;
-      }
-      .weather-icon { font-size: 1.5rem; }
-      .temperature { font-size: 1.4rem; }
-      .city { font-size: 0.65rem; }
+      body { font-size: 18px; }
+      .weather-widget { gap: 12px; padding: 10px 24px; border-radius: 50px; }
+      .weather-icon { font-size: 2.2rem; }
+      .temperature { font-size: 2rem; }
+      .city { font-size: 0.85rem; }
     }
   </style>
 </head>
 <body>
-  <div class="weather-widget" id="weatherWidget">
-    <span class="weather-icon" id="weatherIcon">☀️</span>
+  <div class="weather-widget loading" id="weatherWidget">
+    <span class="weather-icon" id="weatherIcon">🌡️</span>
     <div class="weather-info">
       <span class="temperature" id="temperature">--°</span>
-      <span class="city" id="city">São Paulo</span>
+      <span class="city" id="city">Carregando...</span>
     </div>
   </div>
 
   <script>
-    // ===== CONFIGURAÇÃO =====
     const API_KEY = '46f49c9551bea5305c63071f37f9622d';
-    
     const CITIES = [
       { name: 'São Paulo',     lat: -23.5505, lon: -46.6333 },
       { name: 'Rio de Janeiro', lat: -22.9068, lon: -43.1729 },
       { name: 'Belo Horizonte', lat: -19.9167, lon: -43.9345 }
     ];
-    
-    const ROTATION_INTERVAL = 20000; // 20 segundos
-    // =========================
+    const ROTATION_INTERVAL = 20000;
 
-    const weatherWidget = document.getElementById('weatherWidget');
-    const weatherIconEl = document.getElementById('weatherIcon');
-    const temperatureEl = document.getElementById('temperature');
+    const widget = document.getElementById('weatherWidget');
+    const iconEl = document.getElementById('weatherIcon');
+    const tempEl = document.getElementById('temperature');
     const cityEl = document.getElementById('city');
 
-    let currentCityIndex = 0;
-    let rotationTimer = null;
-    let cachedData = {}; // Armazena dados para troca rápida
+    let cachedData = {};
+    let currentIndex = 0;
+    let dataReady = false;
 
-    // Mapeamento de códigos OpenWeather para emojis
-    function getWeatherEmoji(code) {
-      if (code >= 200 && code < 300) return '⛈️';  // Trovoadas
-      if (code >= 300 && code < 400) return '🌦️';  // Garoa
-      if (code >= 500 && code < 600) return '🌧️';  // Chuva
-      if (code >= 600 && code < 700) return '❄️';  // Neve
-      if (code >= 700 && code < 800) return '🌫️';  // Neblina
-      if (code === 800) return '☀️';                // Limpo
-      if (code === 801) return '🌤️';                // Poucas nuvens
-      if (code >= 802) return '☁️';                 // Nublado
+    function getEmoji(code) {
+      if (code >= 200 && code < 300) return '⛈️';
+      if (code >= 300 && code < 400) return '🌦️';
+      if (code >= 500 && code < 600) return '🌧️';
+      if (code >= 600 && code < 700) return '❄️';
+      if (code >= 700 && code < 800) return '🌫️';
+      if (code === 800) return '☀️';
+      if (code === 801) return '🌤️';
+      if (code >= 802) return '☁️';
       return '🌡️';
     }
 
-    async function fetchWeatherForCity(city) {
+    async function fetchCity(city) {
+      const url = `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${API_KEY}&units=metric&lang=pt`;
+      const res = await fetch(url);
+      const data = await res.json();
+      return {
+        temp: Math.round(data.main.temp),
+        code: data.weather[0].id,
+        name: city.name
+      };
+    }
+
+    async function loadAllCities() {
       try {
-        const url = `https://api.openweathermap.org/data/2.5/weather?lat=${city.lat}&lon=${city.lon}&appid=${API_KEY}&units=metric&lang=pt`;
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        return {
-          temp: Math.round(data.main.temp),
-          weatherCode: data.weather[0].id,
-          name: city.name
-        };
-      } catch (error) {
-        console.error(`Erro ao buscar clima para ${city.name}:`, error);
-        return null;
+        const results = await Promise.all(CITIES.map(city => fetchCity(city)));
+        results.forEach((data, i) => { cachedData[i] = data; });
+        dataReady = true;
+
+        widget.classList.remove('loading');
+        displayCity(currentIndex);
+
+        setInterval(rotateCity, ROTATION_INTERVAL);
+
+        setInterval(async () => {
+          const fresh = await Promise.all(CITIES.map(city => fetchCity(city)));
+          fresh.forEach((data, i) => { cachedData[i] = data; });
+          displayCity(currentIndex);
+        }, 10 * 60 * 1000);
+
+      } catch (err) {
+        console.error('Falha ao carregar clima:', err);
+        tempEl.textContent = '--°';
+        iconEl.textContent = '⚠️';
+        cityEl.textContent = 'Erro';
+        widget.classList.remove('loading');
       }
     }
 
-    async function updateAllCities() {
-      const promises = CITIES.map(city => fetchWeatherForCity(city));
-      const results = await Promise.all(promises);
-      
-      results.forEach((data, index) => {
-        if (data) cachedData[index] = data;
-      });
-      
-      // Atualiza exibição com a cidade atual
-      updateDisplay();
-    }
-
-    function updateDisplay() {
-      const data = cachedData[currentCityIndex];
+    function displayCity(index) {
+      const data = cachedData[index];
       if (!data) return;
-      
-      temperatureEl.textContent = `${data.temp}°`;
-      weatherIconEl.textContent = getWeatherEmoji(data.weatherCode);
+      tempEl.textContent = `${data.temp}°`;
+      iconEl.textContent = getEmoji(data.code);
       cityEl.textContent = data.name;
     }
 
     function rotateCity() {
-      weatherWidget.classList.add('fade');
-      
-      setTimeout(() => {
-        currentCityIndex = (currentCityIndex + 1) % CITIES.length;
-        updateDisplay();
-        weatherWidget.classList.remove('fade');
-      }, 500); // Meio segundo de fade out
+      currentIndex = (currentIndex + 1) % CITIES.length;
+      displayCity(currentIndex);
     }
 
-    // Inicialização
-    async function init() {
-      await updateAllCities();
-      
-      // Inicia rotação
-      rotationTimer = setInterval(rotateCity, ROTATION_INTERVAL);
-      
-      // Atualiza dados a cada 10 minutos (suficiente para clima)
-      setInterval(updateAllCities, 10 * 60 * 1000);
-    }
-
-    init();
+    loadAllCities();
   </script>
 </body>
 </html>
