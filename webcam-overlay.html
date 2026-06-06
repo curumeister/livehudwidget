@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Webcam Overlay - Cupom 25% (Contorno Preto)</title>
+  <title>Barra de Cupom - Topo (com guia de referência)</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
   <style>
     * {
@@ -15,38 +15,29 @@
 
     body {
       background: transparent !important;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
       overflow: hidden;
       font-family: 'Orbitron', monospace;
-    }
-
-    .overlay {
       position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      border: 5px solid #B8860B;
-      border-radius: 0;
-      box-shadow: 0 0 28px rgba(184, 134, 11, 0.85), inset 0 0 16px rgba(218, 165, 32, 0.35);
-      background: transparent;
-      overflow: visible;
     }
 
-    .overlay .border-inner {
+    /* Guia de referência – sempre visível, muito discreto */
+    .bar-guide {
       position: absolute;
-      top: 10px;
-      left: 10px;
-      right: 10px;
-      bottom: 10px;
-      border-radius: 0;
-      box-shadow: inset 0 0 22px rgba(218, 165, 32, 0.5), inset 0 0 8px rgba(184, 134, 11, 0.7);
+      top: 16px;
+      left: 18px;
+      right: 18px;
+      min-height: 52px;
+      height: auto;
+      padding: 10px 14px;
+      z-index: 5;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+      box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.05);
       pointer-events: none;
-      z-index: 3;
     }
 
-    /* BARRA DE CUPOM */
+    /* Barra de cupom */
     .info-bar {
       position: absolute;
       top: 16px;
@@ -61,6 +52,7 @@
       justify-content: center;
       background: rgba(0, 0, 0, 0.3);
       backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
       border-radius: 0;
       font-family: 'Orbitron', monospace;
       font-weight: 600;
@@ -87,84 +79,92 @@
       flex-wrap: wrap;
       gap: 6px;
       text-align: center;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
       white-space: normal;
-    }
-
-    /* Texto padrão com contorno preto */
-    .coupon-text {
       color: #ffffff;
-      font-weight: 500;
       text-shadow:
         -1px -1px 0 #000000,
          1px -1px 0 #000000,
         -1px  1px 0 #000000,
          1px  1px 0 #000000,
-        0 0 6px rgba(255, 255, 255, 0.3);
+        0 0 8px rgba(255, 255, 255, 0.3);
     }
 
+    /* Palavra "CURU" – branco com contorno (sem cor extra) */
     .cupom-highlight {
       font-style: italic;
       font-weight: 900;
-      color: #ffffff;
-      text-shadow:
-        -1px -1px 0 #000000,
-         1px -1px 0 #000000,
-        -1px  1px 0 #000000,
-         1px  1px 0 #000000;
     }
 
+    /* "TRADEIT.GG" em azul */
     .tradeit-highlight {
       font-weight: 800;
-      color: #ffffff;
+      color: #00c8ff;                /* azul neon */
       text-shadow:
         -1px -1px 0 #000000,
          1px -1px 0 #000000,
         -1px  1px 0 #000000,
-         1px  1px 0 #000000;
+         1px  1px 0 #000000,
+        0 0 12px #00c8ff,
+        0 0 6px #00c8ff;
+    }
+
+    /* "25%" em verde */
+    .discount-highlight {
+      font-weight: 800;
+      color: #bfff00;                /* verde neon */
+      text-shadow:
+        -1px -1px 0 #000000,
+         1px -1px 0 #000000,
+        -1px  1px 0 #000000,
+         1px  1px 0 #000000,
+        0 0 12px #bfff00,
+        0 0 6px #bfff00;
     }
 
     @media (max-width: 580px) {
       .coupon-message { font-size: 1rem; }
-      .info-bar { top: 14px; left: 14px; right: 14px; }
-      .overlay { border-width: 4px; }
-      .overlay .border-inner { top: 8px; left: 8px; right: 8px; bottom: 8px; }
+      .info-bar, .bar-guide { 
+        top: 14px; left: 14px; right: 14px; 
+      }
     }
   </style>
 </head>
 <body>
-<div class="overlay">
-  <div class="border-inner"></div>
+  <!-- Guia sempre visível -->
+  <div class="bar-guide"></div>
+
+  <!-- Barra de cupom dinâmica -->
   <div class="info-bar" id="infoBar">
     <span class="coupon-message">
-      <span class="coupon-text">cupom</span>
+      <span>cupom</span>
       <span class="cupom-highlight">CURU</span>
-      <span class="coupon-text">na</span>
+      <span>na</span>
       <span class="tradeit-highlight">TRADEIT.GG</span>
-      <span class="coupon-text">te dá até 25% de desconto</span>
+      <span>te dá até</span>
+      <span class="discount-highlight">25%</span>
+      <span>de desconto</span>
     </span>
   </div>
-</div>
 
-<script>
-  const bar = document.getElementById('infoBar');
-  const DELAY_HIDE = 15000;
-  const INITIAL_DELAY = 5000;
-  const REPEAT_INTERVAL = 90000;
+  <script>
+    const bar = document.getElementById('infoBar');
+    const DELAY_HIDE = 15000;          // 15s visível
+    const INITIAL_DELAY = 5000;        // primeira aparição após 5s
+    const REPEAT_INTERVAL = 90000;     // intervalo de 1min30s
 
-  function showBar() {
-    bar.classList.add('visible');
+    function showBar() {
+      bar.classList.add('visible');
+      setTimeout(() => {
+        bar.classList.remove('visible');
+      }, DELAY_HIDE);
+    }
+
     setTimeout(() => {
-      bar.classList.remove('visible');
-    }, DELAY_HIDE);
-  }
-
-  setTimeout(() => {
-    showBar();
-    setInterval(() => {
       showBar();
-    }, DELAY_HIDE + REPEAT_INTERVAL);
-  }, INITIAL_DELAY);
-</script>
+      setInterval(() => {
+        showBar();
+      }, DELAY_HIDE + REPEAT_INTERVAL);
+    }, INITIAL_DELAY);
+  </script>
 </body>
 </html>
