@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Clima 3 Cidades - Casio Digital (Dia/Noite)</title>
+  <title>Clima 7 Cidades - Casio Digital (Dia/Noite)</title>
   <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     * {
@@ -33,57 +33,51 @@
       border: 1px solid #3A3A3A;
       border-radius: 2px;
       box-shadow: 0 0 6px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(0, 0, 0, 0.5);
-      transition: all 0.4s ease; /* Transição suave para troca de cores */
+      transition: all 0.4s ease;
       opacity: 1;
-      width: 300px;
+      width: 320px;                   /* Largura levemente maior para comportar nomes como Rio Branco */
       justify-content: center;
       text-transform: uppercase;
       letter-spacing: 1px;
       font-family: 'Share Tech Mono', 'Courier New', monospace;
     }
 
-    /* ==================== MODO DIA ==================== */
+    /* MODO DIA */
     .weather-widget.daytime {
-      background-color: #1a1f1a;      /* Fundo cinza-esverdeado escuro */
-      color: #C7FFA0;                /* Texto verde limão */
+      background-color: #1a1f1a;
+      color: #C7FFA0;
       border-color: #4A5A4A;
       background-image: radial-gradient(circle at center, rgba(199, 255, 160, 0.06) 0.5px, transparent 0.5px);
       background-size: 4px 4px;
     }
-
     .daytime .weather-icon {
       filter: drop-shadow(0 0 2px rgba(199, 255, 160, 0.4));
     }
-
     .daytime .temperature {
       color: #C7FFA0;
       text-shadow: 0 0 6px rgba(199, 255, 160, 0.4);
     }
-
     .daytime .city {
       color: #8BA88B;
       text-shadow: 0 0 2px rgba(139, 168, 139, 0.3);
     }
 
-    /* ==================== MODO NOITE ==================== */
+    /* MODO NOITE */
     .weather-widget.nighttime {
-      background-color: #050805;      /* Fundo preto levemente verde */
-      color: #6BFF8E;                /* Texto verde cintilante */
+      background-color: #050805;
+      color: #6BFF8E;
       border-color: #2A3A2A;
       background-image: radial-gradient(circle at center, rgba(107, 255, 142, 0.12) 0.5px, transparent 0.5px);
       background-size: 4px 4px;
       box-shadow: 0 0 8px rgba(0, 0, 0, 0.9), inset 0 0 3px rgba(107, 255, 142, 0.1);
     }
-
     .nighttime .weather-icon {
       filter: drop-shadow(0 0 6px rgba(107, 255, 142, 0.7));
     }
-
     .nighttime .temperature {
       color: #6BFF8E;
       text-shadow: 0 0 10px rgba(107, 255, 142, 0.6);
     }
-
     .nighttime .city {
       color: #4A6A4A;
       text-shadow: 0 0 4px rgba(74, 106, 74, 0.5);
@@ -104,7 +98,7 @@
       display: flex;
       flex-direction: column;
       line-height: 1.2;
-      width: 130px;
+      width: 140px;                  /* Aumentei para dar espaço ao nome das cidades */
     }
 
     .temperature {
@@ -128,7 +122,7 @@
 
     @media (max-width: 480px) {
       body { font-size: 18px; }
-      .weather-widget { width: 260px; padding: 10px 20px; gap: 12px; }
+      .weather-widget { width: 280px; padding: 10px 20px; gap: 12px; }
       .weather-icon { font-size: 2rem; width: 40px; }
       .temperature { font-size: 2.2rem; min-width: 60px; }
       .city { font-size: 0.8rem; }
@@ -149,7 +143,11 @@
     const CITIES = [
       { name: 'São Paulo',     lat: -23.5505, lon: -46.6333 },
       { name: 'Rio de Janeiro', lat: -22.9068, lon: -43.1729 },
-      { name: 'Belo Horizonte', lat: -19.9167, lon: -43.9345 }
+      { name: 'Belo Horizonte', lat: -19.9167, lon: -43.9345 },
+      { name: 'Jales',         lat: -20.2672, lon: -50.5458 },
+      { name: 'Rio Branco',    lat: -9.9749, lon: -67.8243 },
+      { name: 'Recife',        lat: -8.0476, lon: -34.8770 }, // Representando Pernambuco
+      { name: 'Salvador',      lat: -12.9714, lon: -38.5014 }
     ];
     const ROTATION_INTERVAL = 20000;
 
@@ -163,13 +161,12 @@
     let dataReady = false;
 
     function getEmoji(code, isDay) {
-      // Para simplificar, mantive os emojis normais, mas adaptei o sol/lua baseado no horário
       if (code >= 200 && code < 300) return '⛈️';
       if (code >= 300 && code < 400) return '🌦️';
       if (code >= 500 && code < 600) return '🌧️';
       if (code >= 600 && code < 700) return '❄️';
       if (code >= 700 && code < 800) return '🌫️';
-      if (code === 800) return isDay ? '☀️' : '🌙';  // Sol de dia, lua de noite
+      if (code === 800) return isDay ? '☀️' : '🌙';
       if (code === 801) return isDay ? '🌤️' : '☁️';
       if (code >= 802) return '☁️';
       return '🌡️';
@@ -183,13 +180,13 @@
         temp: Math.round(data.main.temp),
         code: data.weather[0].id,
         name: city.name,
-        sunrise: data.sys.sunrise,  // Timestamp UTC do nascer do sol
-        sunset: data.sys.sunset     // Timestamp UTC do pôr do sol
+        sunrise: data.sys.sunrise,
+        sunset: data.sys.sunset
       };
     }
 
     function isDayTime(sunrise, sunset) {
-      const now = Math.floor(Date.now() / 1000); // Momento atual em segundos (UTC)
+      const now = Math.floor(Date.now() / 1000);
       return now >= sunrise && now < sunset;
     }
 
@@ -223,21 +220,14 @@
       const data = cachedData[index];
       if (!data) return;
 
-      // Determina se é dia ou noite
       const day = isDayTime(data.sunrise, data.sunset);
 
-      // Atualiza os textos
       tempEl.textContent = `${data.temp}°`;
       iconEl.textContent = getEmoji(data.code, day);
       cityEl.textContent = data.name;
 
-      // Aplica as classes de estilo
       widget.classList.remove('daytime', 'nighttime');
-      if (day) {
-        widget.classList.add('daytime');
-      } else {
-        widget.classList.add('nighttime');
-      }
+      widget.classList.add(day ? 'daytime' : 'nighttime');
     }
 
     function rotateCity() {
