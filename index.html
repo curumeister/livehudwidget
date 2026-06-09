@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Clima 3 Cidades - Grande e Nítido</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <title>Clima 3 Cidades - Casio Digital (Dia/Noite)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -18,28 +18,75 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
       user-select: none;
       -webkit-font-smoothing: antialiased;
-      /* Aumenta a base do documento para 24px (bem maior) */
       font-size: 24px;
     }
 
     .weather-widget {
+      position: relative;
       display: flex;
       align-items: center;
       gap: 16px;
-      padding: 12px 28px;
-      border-radius: 60px;
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
-      color: #ffffff;
-      transition: opacity 0.5s ease;
+      padding: 12px 24px;
+      border: 1px solid #3A3A3A;
+      border-radius: 2px;
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(0, 0, 0, 0.5);
+      transition: all 0.4s ease; /* Transição suave para troca de cores */
       opacity: 1;
-      /* Tamanho mínimo para garantir que não fique pequeno */
-      min-width: 220px;
+      width: 300px;
+      justify-content: center;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+    }
+
+    /* ==================== MODO DIA ==================== */
+    .weather-widget.daytime {
+      background-color: #1a1f1a;      /* Fundo cinza-esverdeado escuro */
+      color: #C7FFA0;                /* Texto verde limão */
+      border-color: #4A5A4A;
+      background-image: radial-gradient(circle at center, rgba(199, 255, 160, 0.06) 0.5px, transparent 0.5px);
+      background-size: 4px 4px;
+    }
+
+    .daytime .weather-icon {
+      filter: drop-shadow(0 0 2px rgba(199, 255, 160, 0.4));
+    }
+
+    .daytime .temperature {
+      color: #C7FFA0;
+      text-shadow: 0 0 6px rgba(199, 255, 160, 0.4);
+    }
+
+    .daytime .city {
+      color: #8BA88B;
+      text-shadow: 0 0 2px rgba(139, 168, 139, 0.3);
+    }
+
+    /* ==================== MODO NOITE ==================== */
+    .weather-widget.nighttime {
+      background-color: #050805;      /* Fundo preto levemente verde */
+      color: #6BFF8E;                /* Texto verde cintilante */
+      border-color: #2A3A2A;
+      background-image: radial-gradient(circle at center, rgba(107, 255, 142, 0.12) 0.5px, transparent 0.5px);
+      background-size: 4px 4px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.9), inset 0 0 3px rgba(107, 255, 142, 0.1);
+    }
+
+    .nighttime .weather-icon {
+      filter: drop-shadow(0 0 6px rgba(107, 255, 142, 0.7));
+    }
+
+    .nighttime .temperature {
+      color: #6BFF8E;
+      text-shadow: 0 0 10px rgba(107, 255, 142, 0.6);
+    }
+
+    .nighttime .city {
+      color: #4A6A4A;
+      text-shadow: 0 0 4px rgba(74, 106, 74, 0.5);
     }
 
     .weather-widget.loading {
@@ -47,45 +94,44 @@
     }
 
     .weather-icon {
-      font-size: 2.8rem;
+      font-size: 2.5rem;
       line-height: 1;
-      filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3));
+      width: 48px;
+      text-align: center;
     }
 
     .weather-info {
       display: flex;
       flex-direction: column;
       line-height: 1.2;
+      width: 130px;
     }
 
     .temperature {
-      font-size: 2.5rem;
-      font-weight: 500;
+      font-size: 2.8rem;
+      font-weight: 400;
       letter-spacing: -1px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      min-width: 80px;
+      line-height: 1;
     }
 
     .city {
-      font-size: 1rem;
+      font-size: 0.9rem;
       font-weight: 400;
-      opacity: 0.85;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
+      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      white-space: nowrap;
+      margin-top: 2px;
     }
 
-    @keyframes pulse {
-      0% { opacity: 1; }
-      50% { opacity: 0.5; }
-      100% { opacity: 1; }
-    }
-
-    /* Responsivo para telas menores, mas ainda grande */
     @media (max-width: 480px) {
       body { font-size: 18px; }
-      .weather-widget { gap: 12px; padding: 10px 24px; border-radius: 50px; }
-      .weather-icon { font-size: 2.2rem; }
-      .temperature { font-size: 2rem; }
-      .city { font-size: 0.85rem; }
+      .weather-widget { width: 260px; padding: 10px 20px; gap: 12px; }
+      .weather-icon { font-size: 2rem; width: 40px; }
+      .temperature { font-size: 2.2rem; min-width: 60px; }
+      .city { font-size: 0.8rem; }
     }
   </style>
 </head>
@@ -116,14 +162,15 @@
     let currentIndex = 0;
     let dataReady = false;
 
-    function getEmoji(code) {
+    function getEmoji(code, isDay) {
+      // Para simplificar, mantive os emojis normais, mas adaptei o sol/lua baseado no horário
       if (code >= 200 && code < 300) return '⛈️';
       if (code >= 300 && code < 400) return '🌦️';
       if (code >= 500 && code < 600) return '🌧️';
       if (code >= 600 && code < 700) return '❄️';
       if (code >= 700 && code < 800) return '🌫️';
-      if (code === 800) return '☀️';
-      if (code === 801) return '🌤️';
+      if (code === 800) return isDay ? '☀️' : '🌙';  // Sol de dia, lua de noite
+      if (code === 801) return isDay ? '🌤️' : '☁️';
       if (code >= 802) return '☁️';
       return '🌡️';
     }
@@ -135,8 +182,15 @@
       return {
         temp: Math.round(data.main.temp),
         code: data.weather[0].id,
-        name: city.name
+        name: city.name,
+        sunrise: data.sys.sunrise,  // Timestamp UTC do nascer do sol
+        sunset: data.sys.sunset     // Timestamp UTC do pôr do sol
       };
+    }
+
+    function isDayTime(sunrise, sunset) {
+      const now = Math.floor(Date.now() / 1000); // Momento atual em segundos (UTC)
+      return now >= sunrise && now < sunset;
     }
 
     async function loadAllCities() {
@@ -168,9 +222,22 @@
     function displayCity(index) {
       const data = cachedData[index];
       if (!data) return;
+
+      // Determina se é dia ou noite
+      const day = isDayTime(data.sunrise, data.sunset);
+
+      // Atualiza os textos
       tempEl.textContent = `${data.temp}°`;
-      iconEl.textContent = getEmoji(data.code);
+      iconEl.textContent = getEmoji(data.code, day);
       cityEl.textContent = data.name;
+
+      // Aplica as classes de estilo
+      widget.classList.remove('daytime', 'nighttime');
+      if (day) {
+        widget.classList.add('daytime');
+      } else {
+        widget.classList.add('nighttime');
+      }
     }
 
     function rotateCity() {
