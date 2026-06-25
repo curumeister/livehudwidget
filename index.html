@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Clima 7 Cidades - Casio Digital (Dia/Noite)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <title>Clima 7 Cidades - Transparente e Legível</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700;800&display=swap" rel="stylesheet">
   <style>
     * {
       margin: 0;
@@ -18,7 +18,7 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
       user-select: none;
       -webkit-font-smoothing: antialiased;
       font-size: 24px;
@@ -30,57 +30,20 @@
       align-items: center;
       gap: 16px;
       padding: 12px 24px;
-      border: 1px solid #3A3A3A;
-      border-radius: 2px;
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.8), inset 0 0 2px rgba(0, 0, 0, 0.5);
-      transition: all 0.4s ease;
+      
+      /* Fundo totalmente transparente */
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      box-shadow: none;
+      
+      transition: opacity 0.4s ease;
       opacity: 1;
-      width: 320px;                   /* Largura levemente maior para comportar nomes como Rio Branco */
+      width: 320px;
       justify-content: center;
       text-transform: uppercase;
       letter-spacing: 1px;
-      font-family: 'Share Tech Mono', 'Courier New', monospace;
-    }
-
-    /* MODO DIA */
-    .weather-widget.daytime {
-      background-color: #1a1f1a;
-      color: #C7FFA0;
-      border-color: #4A5A4A;
-      background-image: radial-gradient(circle at center, rgba(199, 255, 160, 0.06) 0.5px, transparent 0.5px);
-      background-size: 4px 4px;
-    }
-    .daytime .weather-icon {
-      filter: drop-shadow(0 0 2px rgba(199, 255, 160, 0.4));
-    }
-    .daytime .temperature {
-      color: #C7FFA0;
-      text-shadow: 0 0 6px rgba(199, 255, 160, 0.4);
-    }
-    .daytime .city {
-      color: #8BA88B;
-      text-shadow: 0 0 2px rgba(139, 168, 139, 0.3);
-    }
-
-    /* MODO NOITE */
-    .weather-widget.nighttime {
-      background-color: #050805;
-      color: #6BFF8E;
-      border-color: #2A3A2A;
-      background-image: radial-gradient(circle at center, rgba(107, 255, 142, 0.12) 0.5px, transparent 0.5px);
-      background-size: 4px 4px;
-      box-shadow: 0 0 8px rgba(0, 0, 0, 0.9), inset 0 0 3px rgba(107, 255, 142, 0.1);
-    }
-    .nighttime .weather-icon {
-      filter: drop-shadow(0 0 6px rgba(107, 255, 142, 0.7));
-    }
-    .nighttime .temperature {
-      color: #6BFF8E;
-      text-shadow: 0 0 10px rgba(107, 255, 142, 0.6);
-    }
-    .nighttime .city {
-      color: #4A6A4A;
-      text-shadow: 0 0 4px rgba(74, 106, 74, 0.5);
+      font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
     }
 
     .weather-widget.loading {
@@ -92,32 +55,75 @@
       line-height: 1;
       width: 48px;
       text-align: center;
+      /* Sombra forte para garantir visibilidade em qualquer fundo */
+      filter: drop-shadow(0 0 6px rgba(0,0,0,0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.9));
     }
 
     .weather-info {
       display: flex;
       flex-direction: column;
       line-height: 1.2;
-      width: 140px;                  /* Aumentei para dar espaço ao nome das cidades */
+      width: 140px;
     }
 
     .temperature {
       font-size: 2.8rem;
-      font-weight: 400;
+      font-weight: 800;
       letter-spacing: -1px;
-      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
       min-width: 80px;
       line-height: 1;
+      color: #FFFFFF;
+      /* Sombra dupla para legibilidade máxima contra fundos claros ou escuros */
+      text-shadow: 
+        0 0 10px rgba(0,0,0,0.9),
+        0 2px 4px rgba(0,0,0,0.8),
+        0 0 20px rgba(0,0,0,0.6);
     }
 
     .city {
       font-size: 0.9rem;
-      font-weight: 400;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
-      font-family: 'Share Tech Mono', 'Courier New', monospace;
+      letter-spacing: 1.5px;
+      font-family: 'Inter', 'Segoe UI', 'Roboto', sans-serif;
       white-space: nowrap;
       margin-top: 2px;
+      color: #FFFFFF;
+      /* Sombra dupla para legibilidade máxima */
+      text-shadow: 
+        0 0 8px rgba(0,0,0,0.9),
+        0 2px 3px rgba(0,0,0,0.8);
+    }
+
+    /* MODO DIA - tons mais quentes e claros */
+    .weather-widget.daytime .temperature {
+      color: #FFFFFF;
+      text-shadow: 
+        0 0 10px rgba(0,0,0,0.9),
+        0 2px 4px rgba(0,0,0,0.8);
+    }
+    .weather-widget.daytime .city {
+      color: #E0E0E0;
+      text-shadow: 
+        0 0 8px rgba(0,0,0,0.9),
+        0 2px 3px rgba(0,0,0,0.8);
+    }
+
+    /* MODO NOITE - tons levemente azulados */
+    .weather-widget.nighttime .temperature {
+      color: #FFFFFF;
+      text-shadow: 
+        0 0 12px rgba(0,0,0,0.95),
+        0 0 25px rgba(0,0,0,0.7),
+        0 2px 4px rgba(0,0,0,0.9);
+    }
+    .weather-widget.nighttime .city {
+      color: #D0D0FF;
+      text-shadow: 
+        0 0 10px rgba(0,0,0,0.95),
+        0 0 20px rgba(0,0,0,0.6),
+        0 2px 3px rgba(0,0,0,0.8);
     }
 
     @media (max-width: 480px) {
@@ -146,7 +152,7 @@
       { name: 'Belo Horizonte', lat: -19.9167, lon: -43.9345 },
       { name: 'Jales',         lat: -20.2672, lon: -50.5458 },
       { name: 'Rio Branco',    lat: -9.9749, lon: -67.8243 },
-      { name: 'Recife',        lat: -8.0476, lon: -34.8770 }, // Representando Pernambuco
+      { name: 'Recife',        lat: -8.0476, lon: -34.8770 },
       { name: 'Salvador',      lat: -12.9714, lon: -38.5014 }
     ];
     const ROTATION_INTERVAL = 20000;
