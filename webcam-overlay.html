@@ -1,170 +1,247 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Barra de Cupom - Topo (com guia de referência)</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Barra de Cupom · Topo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet" />
+    <style>
+        /* ── reset ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
 
-    body {
-      background: transparent !important;
-      min-height: 100vh;
-      overflow: hidden;
-      font-family: 'Orbitron', monospace;
-      position: relative;
-    }
+        body {
+            background: transparent !important;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Orbitron', monospace;
+            position: relative;
+        }
 
-    /* Guia de referência – sempre visível, muito discreto */
-    .bar-guide {
-      position: absolute;
-      top: 16px;
-      left: 18px;
-      right: 18px;
-      min-height: 52px;
-      height: auto;
-      padding: 10px 14px;
-      z-index: 5;
-      border: 1px dashed rgba(255, 255, 255, 0.15);
-      border-radius: 2px;
-      box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.05);
-      pointer-events: none;
-    }
+        /* ── guia de referência (sempre visível, discreta) ── */
+        .bar-guide {
+            position: absolute;
+            top: 16px;
+            left: 18px;
+            right: 18px;
+            min-height: 52px;
+            height: auto;
+            padding: 10px 14px;
+            z-index: 5;
+            border: 1px dashed rgba(255, 255, 255, 0.12);
+            border-radius: 2px;
+            box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.04);
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
 
-    /* Barra de cupom */
-    .info-bar {
-      position: absolute;
-      top: 16px;
-      left: 18px;
-      right: 18px;
-      min-height: 52px;
-      height: auto;
-      padding: 10px 14px;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(0, 0, 0, 0.3);
-      backdrop-filter: blur(5px);
-      -webkit-backdrop-filter: blur(5px);
-      border-radius: 0;
-      font-family: 'Orbitron', monospace;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      overflow: hidden;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
-      box-shadow: 0 0 0 2px #B8860B, 0 0 22px 6px rgba(184, 134, 11, 0.8), inset 0 0 16px rgba(218, 165, 32, 0.35);
-      border: 1px solid #DAA520;
-    }
+        /* ── barra principal ── */
+        .info-bar {
+            position: absolute;
+            top: 16px;
+            left: 18px;
+            right: 18px;
+            min-height: 52px;
+            height: auto;
+            padding: 10px 14px;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+            border-radius: 0;
+            font-family: 'Orbitron', monospace;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease, box-shadow 0.3s ease;
+            box-shadow: 0 0 0 2px #b8860b, 0 0 22px 6px rgba(184, 134, 11, 0.7),
+                inset 0 0 16px rgba(218, 165, 32, 0.3);
+            border: 1px solid #daa520;
+        }
 
-    .info-bar.visible {
-      opacity: 1;
-      visibility: visible;
-    }
+        .info-bar.visible {
+            opacity: 1;
+            visibility: visible;
+        }
 
-    .coupon-message {
-      font-weight: 700;
-      font-size: 1.3rem;
-      display: flex;
-      align-items: baseline;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 6px;
-      text-align: center;
-      white-space: normal;
-      color: #ffffff;
-      text-shadow:
-        -1px -1px 0 #000000,
-         1px -1px 0 #000000,
-        -1px  1px 0 #000000,
-         1px  1px 0 #000000,
-        0 0 8px rgba(255, 255, 255, 0.3);
-    }
+        /* ── mensagem ── */
+        .coupon-message {
+            font-weight: 700;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            text-align: center;
+            white-space: normal;
+            color: #ffffff;
+            text-shadow:
+                -1px -1px 0 #000000,
+                1px -1px 0 #000000,
+                -1px 1px 0 #000000,
+                1px 1px 0 #000000,
+                0 0 8px rgba(255, 255, 255, 0.25);
+        }
 
-    /* Palavra "CURU" – branco com contorno (sem cor extra) */
-    .cupom-highlight {
-      font-style: italic;
-      font-weight: 900;
-    }
+        /* ── "opior" – dourado neon com efeito piscante ── */
+        .cupom-highlight {
+            font-style: italic;
+            font-weight: 900;
+            color: #ffcc00;
+            text-shadow:
+                0 0 8px #ffcc00,
+                0 0 16px #ffaa00,
+                0 0 32px #ff8800,
+                -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+            animation: blinkPisca 1.2s ease-in-out infinite;
+        }
 
-    /* "TRADEIT.GG" em azul */
-    .tradeit-highlight {
-      font-weight: 800;
-      color: #00c8ff;                /* azul neon */
-      text-shadow:
-        -1px -1px 0 #000000,
-         1px -1px 0 #000000,
-        -1px  1px 0 #000000,
-         1px  1px 0 #000000,
-        0 0 12px #00c8ff,
-        0 0 6px #00c8ff;
-    }
+        @keyframes blinkPisca {
+            0%,
+            100% {
+                opacity: 1;
+                text-shadow: 0 0 8px #ffcc00, 0 0 16px #ffaa00, 0 0 32px #ff8800,
+                    -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            }
+            50% {
+                opacity: 0.2;
+                text-shadow: 0 0 4px #ffcc00, 0 0 8px #ffaa00,
+                    -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+            }
+        }
 
-    /* "25%" em verde */
-    .discount-highlight {
-      font-weight: 800;
-      color: #bfff00;                /* verde neon */
-      text-shadow:
-        -1px -1px 0 #000000,
-         1px -1px 0 #000000,
-        -1px  1px 0 #000000,
-         1px  1px 0 #000000,
-        0 0 12px #bfff00,
-        0 0 6px #bfff00;
-    }
+        /* ── "TRADEIT.GG" – azul neon ── */
+        .tradeit-highlight {
+            font-weight: 800;
+            color: #00c8ff;
+            text-shadow:
+                -1px -1px 0 #000000,
+                1px -1px 0 #000000,
+                -1px 1px 0 #000000,
+                1px 1px 0 #000000,
+                0 0 12px #00c8ff,
+                0 0 6px #00c8ff;
+        }
 
-    @media (max-width: 580px) {
-      .coupon-message { font-size: 1rem; }
-      .info-bar, .bar-guide { 
-        top: 14px; left: 14px; right: 14px; 
-      }
-    }
-  </style>
+        /* ── "25%" – verde neon ── */
+        .discount-highlight {
+            font-weight: 800;
+            color: #bfff00;
+            text-shadow:
+                -1px -1px 0 #000000,
+                1px -1px 0 #000000,
+                -1px 1px 0 #000000,
+                1px 1px 0 #000000,
+                0 0 12px #bfff00,
+                0 0 6px #bfff00;
+        }
+
+        /* ── responsive ── */
+        @media (max-width: 580px) {
+            .coupon-message {
+                font-size: 0.95rem;
+                gap: 4px;
+            }
+            .info-bar,
+            .bar-guide {
+                top: 14px;
+                left: 14px;
+                right: 14px;
+                min-height: 44px;
+                padding: 8px 10px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .coupon-message {
+                font-size: 0.78rem;
+                gap: 2px;
+            }
+            .info-bar,
+            .bar-guide {
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                min-height: 38px;
+                padding: 6px 8px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- Guia sempre visível -->
-  <div class="bar-guide"></div>
 
-  <!-- Barra de cupom dinâmica -->
-  <div class="info-bar" id="infoBar">
-    <span class="coupon-message">
-      <span>cupom</span>
-      <span class="cupom-highlight">CURU</span>
-      <span>na</span>
-      <span class="tradeit-highlight">TRADEIT.GG</span>
-      <span>te dá até</span>
-      <span class="discount-highlight">25%</span>
-      <span>de desconto</span>
-    </span>
-  </div>
+    <!-- Guia de referência (sempre visível) -->
+    <div class="bar-guide" id="guide"></div>
 
-  <script>
-    const bar = document.getElementById('infoBar');
-    const DELAY_HIDE = 15000;          // 15s visível
-    const INITIAL_DELAY = 5000;        // primeira aparição após 5s
-    const REPEAT_INTERVAL = 90000;     // intervalo de 1min30s
+    <!-- Barra de cupom -->
+    <div class="info-bar" id="infoBar">
+        <span class="coupon-message">
+            <span>cupom</span>
+            <span class="cupom-highlight">opior</span>
+            <span>na</span>
+            <span class="tradeit-highlight">TRADEIT.GG</span>
+            <span>te dá até</span>
+            <span class="discount-highlight">25%</span>
+            <span>de desconto</span>
+        </span>
+    </div>
 
-    function showBar() {
-      bar.classList.add('visible');
-      setTimeout(() => {
-        bar.classList.remove('visible');
-      }, DELAY_HIDE);
-    }
+    <script>
+        (function() {
+            const bar = document.getElementById('infoBar');
+            const guide = document.getElementById('guide');
 
-    setTimeout(() => {
-      showBar();
-      setInterval(() => {
-        showBar();
-      }, DELAY_HIDE + REPEAT_INTERVAL);
-    }, INITIAL_DELAY);
-  </script>
+            // ── configurações de temporização (em ms) ──
+            const CFG = {
+                INITIAL_DELAY: 5000, // 5s  – primeira aparição
+                VISIBLE_TIME: 15000, // 15s – tempo em que fica visível
+                HIDDEN_TIME: 90000, // 90s – tempo escondida entre ciclos
+            };
+
+            // ── mostra a barra ──
+            function showBar() {
+                bar.classList.add('visible');
+                // esconde após VISIBLE_TIME
+                setTimeout(() => {
+                    bar.classList.remove('visible');
+                }, CFG.VISIBLE_TIME);
+            }
+
+            // ── inicia o ciclo ──
+            function startCycle() {
+                // primeira aparição após INITIAL_DELAY
+                setTimeout(() => {
+                    showBar();
+                    // a partir daí, repete a cada (VISIBLE_TIME + HIDDEN_TIME)
+                    setInterval(() => {
+                        showBar();
+                    }, CFG.VISIBLE_TIME + CFG.HIDDEN_TIME);
+                }, CFG.INITIAL_DELAY);
+            }
+
+            // ── opcional: esconde a guia de referência após alguns segundos ──
+            setTimeout(() => {
+                guide.style.opacity = '0';
+                guide.style.transition = 'opacity 1.2s ease';
+            }, 8000);
+
+            // ── inicia ──
+            startCycle();
+        })();
+    </script>
+
 </body>
 </html>
