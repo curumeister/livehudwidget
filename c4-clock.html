@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Visor C4 · Counter-Strike</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #0a0c10;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Courier New', monospace;
+            padding: 16px;
+        }
+
+        /* ── o visor da C4 ── */
+        .c4-display {
+            background: #0b0d10;
+            padding: 24px 32px;
+            border-radius: 12px;
+            box-shadow: 0 0 0 2px #1a1e24,
+                        0 0 0 6px #050608,
+                        inset 0 0 30px rgba(0, 0, 0, 0.9);
+            border: 1px solid #2a2e36;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        /* ── números gigantes ── */
+        .time-digits {
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            font-size: 5rem;
+            letter-spacing: 8px;
+            color: #ff2222;
+            text-shadow: 0 0 12px #ff0000,
+                         0 0 24px #ff000066,
+                         0 0 48px #ff000033;
+            background: #050608;
+            padding: 12px 8px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .time-digits .colon {
+            color: #ff4444;
+            text-shadow: 0 0 10px #ff0000;
+            margin: 0 2px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.15; }
+        }
+
+        /* ── legenda "C4" discreta (opcional) ── */
+        .c4-label {
+            margin-top: 10px;
+            color: #3a3f4a;
+            font-size: 0.7rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-top: 1px solid #1a1e24;
+            padding-top: 10px;
+        }
+
+        /* ── responsivo ── */
+        @media (max-width: 480px) {
+            .c4-display {
+                padding: 16px 18px;
+                min-width: unset;
+                width: 95vw;
+            }
+            .time-digits {
+                font-size: 3.2rem;
+                letter-spacing: 4px;
+                padding: 8px 4px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .time-digits {
+                font-size: 2.4rem;
+                letter-spacing: 2px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="c4-display">
+        <div class="time-digits" id="timeDisplay">
+            <span id="hh">00</span>
+            <span class="colon">:</span>
+            <span id="mm">00</span>
+            <span class="colon">:</span>
+            <span id="ss">00</span>
+        </div>
+        <div class="c4-label">● C4 ●</div>
+    </div>
+
+    <script>
+        (function() {
+            const hh = document.getElementById('hh');
+            const mm = document.getElementById('mm');
+            const ss = document.getElementById('ss');
+
+            function updateClock() {
+                const now = new Date();
+                hh.textContent = String(now.getHours()).padStart(2, '0');
+                mm.textContent = String(now.getMinutes()).padStart(2, '0');
+                ss.textContent = String(now.getSeconds()).padStart(2, '0');
+            }
+
+            updateClock();
+            setInterval(updateClock, 1000);
+        })();
+    </script>
+
+</body>
+</html>
