@@ -6,7 +6,6 @@
     <title>Barra de Cupom · Topo</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&display=swap" rel="stylesheet" />
     <style>
-        /* ── reset ── */
         * {
             margin: 0;
             padding: 0;
@@ -22,7 +21,6 @@
             position: relative;
         }
 
-        /* ── guia de referência (sempre visível, discreta) ── */
         .bar-guide {
             position: absolute;
             top: 16px;
@@ -39,7 +37,6 @@
             transition: opacity 0.4s ease;
         }
 
-        /* ── barra principal ── */
         .info-bar {
             position: absolute;
             top: 16px;
@@ -73,7 +70,6 @@
             visibility: visible;
         }
 
-        /* ── mensagem ── */
         .coupon-message {
             font-weight: 700;
             font-size: 1.3rem;
@@ -93,7 +89,6 @@
                 0 0 8px rgba(255, 255, 255, 0.25);
         }
 
-        /* ── "opior" – dourado neon com efeito piscante ── */
         .cupom-highlight {
             font-style: italic;
             font-weight: 900;
@@ -110,8 +105,7 @@
         }
 
         @keyframes blinkPisca {
-            0%,
-            100% {
+            0%, 100% {
                 opacity: 1;
                 text-shadow: 0 0 8px #ffcc00, 0 0 16px #ffaa00, 0 0 32px #ff8800,
                     -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
@@ -123,7 +117,6 @@
             }
         }
 
-        /* ── "TRADEIT.GG" – azul neon ── */
         .tradeit-highlight {
             font-weight: 800;
             color: #00c8ff;
@@ -136,7 +129,6 @@
                 0 0 6px #00c8ff;
         }
 
-        /* ── "25%" – verde neon ── */
         .discount-highlight {
             font-weight: 800;
             color: #bfff00;
@@ -149,48 +141,31 @@
                 0 0 6px #bfff00;
         }
 
-        /* ── responsive ── */
         @media (max-width: 580px) {
-            .coupon-message {
-                font-size: 0.95rem;
-                gap: 4px;
-            }
-            .info-bar,
-            .bar-guide {
-                top: 14px;
-                left: 14px;
-                right: 14px;
-                min-height: 44px;
-                padding: 8px 10px;
+            .coupon-message { font-size: 0.95rem; gap: 4px; }
+            .info-bar, .bar-guide {
+                top: 14px; left: 14px; right: 14px;
+                min-height: 44px; padding: 8px 10px;
             }
         }
 
         @media (max-width: 400px) {
-            .coupon-message {
-                font-size: 0.78rem;
-                gap: 2px;
-            }
-            .info-bar,
-            .bar-guide {
-                top: 10px;
-                left: 10px;
-                right: 10px;
-                min-height: 38px;
-                padding: 6px 8px;
+            .coupon-message { font-size: 0.78rem; gap: 2px; }
+            .info-bar, .bar-guide {
+                top: 10px; left: 10px; right: 10px;
+                min-height: 38px; padding: 6px 8px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Guia de referência (sempre visível) -->
     <div class="bar-guide" id="guide"></div>
 
-    <!-- Barra de cupom -->
     <div class="info-bar" id="infoBar">
         <span class="coupon-message">
             <span>cupom</span>
-            <span class="cupom-highlight">opior</span>
+            <span class="cupom-highlight">CURU</span>
             <span>na</span>
             <span class="tradeit-highlight">TRADEIT.GG</span>
             <span>te dá até</span>
@@ -204,41 +179,33 @@
             const bar = document.getElementById('infoBar');
             const guide = document.getElementById('guide');
 
-            // ── configurações de temporização (em ms) ──
             const CFG = {
-                INITIAL_DELAY: 5000, // 5s  – primeira aparição
-                VISIBLE_TIME: 15000, // 15s – tempo em que fica visível
-                HIDDEN_TIME: 90000, // 90s – tempo escondida entre ciclos
+                INITIAL_DELAY: 5000,
+                VISIBLE_TIME: 15000,
+                HIDDEN_TIME: 90000,
             };
 
-            // ── mostra a barra ──
             function showBar() {
                 bar.classList.add('visible');
-                // esconde após VISIBLE_TIME
                 setTimeout(() => {
                     bar.classList.remove('visible');
                 }, CFG.VISIBLE_TIME);
             }
 
-            // ── inicia o ciclo ──
             function startCycle() {
-                // primeira aparição após INITIAL_DELAY
                 setTimeout(() => {
                     showBar();
-                    // a partir daí, repete a cada (VISIBLE_TIME + HIDDEN_TIME)
                     setInterval(() => {
                         showBar();
                     }, CFG.VISIBLE_TIME + CFG.HIDDEN_TIME);
                 }, CFG.INITIAL_DELAY);
             }
 
-            // ── opcional: esconde a guia de referência após alguns segundos ──
             setTimeout(() => {
                 guide.style.opacity = '0';
                 guide.style.transition = 'opacity 1.2s ease';
             }, 8000);
 
-            // ── inicia ──
             startCycle();
         })();
     </script>
